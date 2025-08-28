@@ -1,0 +1,61 @@
+<html>
+<head>
+    <title>Function Roles</title>
+</head>
+<body>
+    {% if roles_msg %}
+    <h2>Step 1: Define Roles of Each Function</h2>
+    <form action="/roles" method="post">
+        <label>Function Names (comma-separated):</label><br>
+        <input type="text" name="functions" required><br><br>
+        
+        <label>Roles (comma-separated, match order):</label><br>
+        <input type="text" name="roles" required><br><br>
+        
+        <button type="submit">Next</button>
+    </form>
+    {% endif %}
+
+    {% if arg_counts_msg %}
+    <h2>Step 2: Enter Number of Arguments for Each Function</h2>
+    <form action="/arg_counts" method="application/x-www-form-urlencoded">
+        {% for func in functions %}
+            <label>{{ func }}:</label>
+            <input type="number" name="{{ func }}" min="0" required><br><br>
+        {% endfor %}
+        <button type="submit">Next</button>
+    </form>
+    {% endif %}
+
+    {% if arg_names_msg %}
+    <h2>Step 3: Enter Argument description for Each Function (comma-separated)</h2>
+    <form action="/arg_names" method="application/x-www-form-urlencoded">
+        {% for func in functions %}
+            <label>{{ func }}:</label>
+            <input type="text" name="{{ func }}" placeholder="arg1, arg2, arg3" required><br><br>
+        {% endfor %}
+        <button type="submit">Finish</button>
+    </form>
+    {% endif %}
+
+    {% if arg_meaning %}
+    <h2>step4: enter the roles of Argument(comma-separated)</h2>
+    <form action="/arg_roles" method="application/x-www-form-urlencoded">
+        {% for func in functions %}
+            <label>{{ func }}:</label>
+            <input type="text" name="{{ func }}" placeholder="arg1, arg2, arg3" required><br><br>
+        {% endfor %}
+        <button type="submit">Finish</button>
+    </form>
+    {% endif %}
+
+    {% if api_key %}
+    <h2>Generate the api_key</h2>
+    <form action="/api_key" method="post">
+            <h2>{{key}}</h2>
+            <button type="submit">Finish</button>
+    </form>
+    {% endif %}
+
+</body>
+</html>

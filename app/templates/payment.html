@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Razorpay Payment Demo</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      background: #f7f7f7;
+    }
+    #pay-btn {
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      background-color: #3399cc;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #pay-btn:hover {
+      background-color: #287aa6;
+    }
+  </style>
+</head>
+<body>
+  <button id="pay-btn">Pay ₹1000</button>
+
+  <script>
+    // Function to create order by calling FastAPI backend
+    async function createOrder() {
+      let response = await fetch("http://localhost:8000/create-order?amount=1000", {
+        method: "POST"
+      });
+      let order = await response.json();
+      return order;
+    }
+
+    // Handle button click
+    document.getElementById('pay-btn').onclick = async function(e) {
+      const order = await createOrder();
+
+      var options = {
+        "key": "rzp_test_R9HkZqqt7zcFbc", // Replace with your Razorpay Key ID
+        "amount": order.amount,
+        "currency": order.currency,
+        "name": "My Shop",
+        "description": "Test Transaction",
+        "order_id": order.id, // order_id from backend
+        "handler": async function (response) {
+          // Send details back to FastAPI for verification
+          let verifyRes = await fetch("http://localhost:8000/verify-payment/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(response)
+          });
+          let verifyData = await verifyRes.json();
+          if (verifyData.status === "success") {
+            alert("✅ Payment Successful!");
+          } else {
+            alert("❌ Payment Verification Failed!");
+          }
+        },
+        "prefill": {
+          "name": "Test User",
+          "email": "test@example.com",
+          "contact": "9876543210"
+        },
+        "theme": {
+          "color": "#3399cc"
+        }
+      };
+
+      var rzp1 = new Razorpay(options);
+      rzp1.open();
+      e.preventDefault();
+    };
+  </script>
+</body>
+</html>
+
+

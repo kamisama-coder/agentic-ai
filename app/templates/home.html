@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>Home</title></head>
+<body>
+    <h2>Welcome!</h2>
+    <a href="/register">Register</a> | <a href="/login">Login</a>
+    {% if api_key %}
+    <h2>Generate the api_key</h2>
+    <form action="/api_key" method="post">
+            <h2>{{key}}</h2>
+            <button type="submit">Finish</button>
+    </form>
+    {% endif %}
+
+</body>
+</html>
