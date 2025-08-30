@@ -28,13 +28,13 @@
     {% endif %}
 
     {% if arg_names_msg %}
-    <h2>Step 3: Enter Argument description for Each Function (comma-separated)</h2>
+    <h2>Step 3: Enter Arguments Each Function (comma-separated)</h2>
     <form action="/arg_names" method="application/x-www-form-urlencoded">
         {% for func in functions %}
             <label>{{ func }}:</label>
             <input type="text" name="{{ func }}" placeholder="arg1, arg2, arg3" required><br><br>
         {% endfor %}
-        <button type="submit">Finish</button>
+        <button type="submit">Next</button>
     </form>
     {% endif %}
 
