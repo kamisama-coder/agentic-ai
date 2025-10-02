@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Form, Request, Depends, status, Response, HTTPException, Query, Header
+from fastapi import FastAPI, Form, Request, Depends, status, Response, HTTPException, Query, Header, WebSocket
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 import json
 from fastapi.templating import Jinja2Templates
 import threading
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
-from google import genai
 from passlib.context import CryptContext
 from itsdangerous import URLSafeSerializer
 from pydantic import BaseModel
@@ -16,13 +16,21 @@ import hmac
 import hashlib
 from datetime import datetime, timedelta
 import os
+import io
+import asyncio # Import asyncio for running subprocesses
+import aiofiles # pip install aiofiles
+from fastapi.concurrency import run_in_threadpool 
+import sys
+from llm import creator 
+import tempfile
+from contextlib import redirect_stdout
 import time
 import razorpay
 
 
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
-client = genai.Client(api_key='AIzaSyADvZjtVNSnOAnNUGJcMB1oWiC3ZgwAhFY')
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 def generate_token():
     return secrets.token_hex(32)  # 64-character secure token
@@ -261,6 +269,83 @@ def api_key(request: Request,db: Session = Depends(get_db), source: str = Form(N
 @app.get("/pay",response_class=HTMLResponse)
 def pay(request: Request):
     return templates.TemplateResponse("payment.html", {"request": request})   
+
+# This helper function runs the dangerous pip install in a non-blocking way
+async def install_module(module: str):
+    """Asynchronously runs pip install."""
+    # Create a subprocess without blocking the main event loop
+    process = await asyncio.create_subprocess_exec(
+        sys.executable, "-m", "pip", "install", module,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    # Wait for the process to finish
+    stdout, stderr = await process.communicate()
+    if process.returncode != 0:
+        # If pip fails, raise an error
+        raise HTTPException(status_code=500, detail=f"Failed to install module '{module}': {stderr.decode()}")
+
+@app.post("/call")
+async def call_api(request: Request, authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("token "):
+        raise HTTPException(status_code=401, detail="Missing or invalid authorization token")
+    
+    token = authorization.split(" ")[1]
+
+    try:
+        params = await request.json()
+        prompt = params['prompt']
+        import_lines = params['import_lines']
+        filepy_str = params['filepy']
+        return_type_str = params['return_type']
+    except (json.JSONDecodeError, KeyError) as e:
+        raise HTTPException(status_code=400, detail=f"Invalid or missing parameters in request body: {e}")
+
+    # --- DANGEROUS: Run module installation asynchronously ---
+    # This still carries the same severe security risk, but it will no longer block the server.
+    modules_to_install = params.get("modules", [])
+    if modules_to_install:
+        # Run all installations concurrently
+        install_tasks = [install_module(module) for module in modules_to_install]
+        await asyncio.gather(*install_tasks)
+    
+    # --- Asynchronously write to a temporary file ---
+    temp_dir = tempfile.gettempdir()
+    temp_filename = os.path.join(temp_dir, f"{os.urandom(24).hex()}.py")
+    
+    try:
+        functions = json.loads(filepy_str) # This is still blocking but usually very fast
+        async with aiofiles.open(temp_filename, 'w') as f:
+            for line in import_lines:
+                await f.write(line + "\n")
+            await f.write("\n")
+            for name, code in functions.items():
+                await f.write(code + "\n\n")
+
+        type_map = {"float": float, "int": int, "str": str}
+        real_type = type_map.get(return_type_str)
+        if real_type is None:
+            raise HTTPException(status_code=400, detail=f"Unsupported return_type: '{return_type_str}'")
+
+        log_stream = io.StringIO()
+        result = None
+
+        def run_llm_logic():
+            """Wrapper function for the synchronous LLM code."""
+            with redirect_stdout(log_stream):
+                controller = creator(prompt, token, temp_filename, real_type)
+                return controller.get_output()
+
+        # Safely run the synchronous LLM functions in a separate thread
+        result = await run_in_threadpool(run_llm_logic)
+
+        logs = log_stream.getvalue().splitlines()
+
+        return {"result": result, "logs": logs}
+    finally:
+        # Cleanup the temporary file
+        if os.path.exists(temp_filename):
+            os.remove(temp_filename)
     
 @app.post('/create-order',response_class=HTMLResponse)
 def payment(amount:int):

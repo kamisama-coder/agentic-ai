@@ -1,4 +1,4 @@
-from google import genai,generativeai
+from google import generativeai
 import threading
 import importlib.util
 import torch
@@ -7,6 +7,10 @@ import requests
 import ast
 import re
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def clean_ai_output(response_text):
    
@@ -54,7 +58,7 @@ class Controller:
                 self.slow_save = []
                 self.api_key = api_key
                 self.start = start
-                generativeai.configure(api_key='AIzaSyADvZjtVNSnOAnNUGJcMB1oWiC3ZgwAhFY')
+                generativeai.configure(api_key=os.environ.get('API_KEY'))
                 self.model = generativeai.GenerativeModel('gemini-2.5-flash')
                 self.function_response = start
                 self.instruction = None
@@ -74,7 +78,6 @@ class Controller:
             headers = {"Authorization": f"token {self.api_key}"}
             requests.get("http://localhost:8000/decrease_token",headers=headers)
             
-
 
         def connect_database(self):
             headers = {"Authorization": f"token {self.api_key}"}
@@ -206,48 +209,56 @@ class Controller:
                     print(self.response['output'])
                     break
 
-            for key,value in self.response['arguments'].items():
+            for key, value in self.response.get('arguments', {}).items():
                 print(type(self.response))
                 self.response['arguments'][key] = safe_convert(value)
 
             print("Convertor Response:", self.response) 
 
             try:
+
+                if not self.response['arguments']:
+                    raise TypeError("No arguments provided")
+
                 recieved_imf = self.module_dict[self.response['function']](**self.response['arguments'])
                 check['function_returned_part'] = recieved_imf
                 check['function'] = self.response['function']
                 check['return type'] = type(recieved_imf)
                 self.slow_save.append(check)
 
-            except (KeyError,TypeError,AttributeError):                                                                          
+            except (KeyError,TypeError,AttributeError):
+                                                                                          
                 self.response['output'] = safe_convert(self.response['output'])
                 if not isinstance(self.response['output'], self.type):
                     self.function_response = self.start
                     self.slow_save = []
                     continue
 
-                print(self.response['output'])    
+                self.output = self.response['output']    
                 break
 
+        def get_output(self):
+            return self.output
 
 
 
 def creator(start,save_id,filename,type):    
-    return Controller(start,save_id,filename,type)       
-            
-current_dir = os.path.dirname(os.path.abspath(__file__))
+    return Controller(start,save_id,filename,type)    
 
-filename = os.path.join(current_dir, "test.py")
+          
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# filename = os.path.join(current_dir, "test.py")
 
 
-creation_obj = creator(
-    "generate a sentence about a 'vase' and generate the embeddings of the text and generate the embeddings of the image 'chinese vase.jpg' and compare them",
-    '426c9a80311faad2398f28032b975c04183d324ef2afa0b29ba233ee56b1042b',
-    filename,
-    float
-)            
+# creation_obj = creator(
+#     "generate a sentence about a 'vase' and generate the embeddings of the text and generate the embeddings of the image 'chinese vase.jpg' and compare them",
+#     'aa47fcb7de42ea818c32fb81f8087089faad90d13de7b5fe4cce2be0ae820ae7',
+#     filename,
+#     float
+# )            
 
-            
+# print(creation_obj.get_output())            
             
             
 

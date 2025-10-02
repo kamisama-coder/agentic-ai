@@ -1,16 +1,137 @@
 <!DOCTYPE html>
 <html>
-<head><title>Home</title></head>
-<body>
-    <h2>Welcome!</h2>
-    <a href="/register">Register</a> | <a href="/login">Login</a>
-    {% if api_key %}
-    <h2>Generate the api_key</h2>
-    <form action="/api_key" method="post">
-            <h2>{{key}}</h2>
-            <button type="submit">Finish</button>
-    </form>
-    {% endif %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        /* Base Styles and Layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fb;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Center vertically */
+            padding: 20px;
+            margin: 0;
+        }
 
+        /* Container Card Styling */
+        .container-card {
+            width: 100%;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Welcome Header */
+        .welcome-header {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #2563eb; /* Blue color */
+            font-weight: 600;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .nav-links a:hover {
+            color: #1d4ed8;
+            background-color: #eff6ff; /* Light blue background on hover */
+        }
+
+        /* API Key Section */
+        .api-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* Key Display */
+        .key-display-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        .key-value {
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            color: #059669; /* Green color */
+            background-color: #f0fdf4; /* Very light green background */
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #d1fae5;
+            word-break: break-all;
+            text-align: center;
+        }
+
+        /* Button Styling */
+        .btn-generate {
+            width: 100%;
+            background-color: #10b981; /* Green color */
+            color: white;
+            font-weight: 700;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.15s, box-shadow 0.15s;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+        .btn-generate:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-card">
+        <h2 class="welcome-header">Welcome!</h2>
+        
+        <div class="nav-links">
+            <a href="/register">Register</a>
+            <a href="/login">Login</a>
+        </div>
+        
+        {% if api_key %}
+        <div class="api-section">
+            <h2 class="key-display-label">Generate the API Key</h2>
+            <form action="/api_key" method="post">
+                {% if key %}
+                    <h2 class="key-value">{{ key }}</h2>
+                {% else %}
+                    <!-- If key is not yet generated, display a placeholder -->
+                    <h2 class="key-value" style="color: #9ca3af; background-color: #f3f4f6; border-color: #e5e7eb;">Key will be generated here</h2>
+                {% endif %}
+                
+                <button type="submit" class="btn-generate">Generate</button>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
 </body>
 </html>
+

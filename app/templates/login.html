@@ -1,16 +1,142 @@
 <!DOCTYPE html>
 <html>
-<head><title>Login</title></head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        /* Base Styles and Layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fb;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Center vertically */
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* Container Card Styling */
+        .container-card {
+            width: 100%;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Header */
+        .page-header {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        /* Error Message */
+        .error-message {
+            color: #dc2626; /* Red color */
+            background-color: #fee2e2; /* Light red background */
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #fca5a5;
+            font-weight: 500;
+        }
+
+        /* Form Layout */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            text-align: left;
+        }
+
+        /* Label and Input Group */
+        form label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        form input[type="text"], 
+        form input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-top: 4px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        form input[type="text"]:focus, 
+        form input[type="password"]:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5);
+            outline: none;
+        }
+
+        /* Button Styling */
+        .btn-submit {
+            width: 100%;
+            background-color: #2563eb; /* Blue color */
+            color: white;
+            font-weight: 700;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.15s, box-shadow 0.15s;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-top: 8px;
+        }
+        .btn-submit:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Home Link */
+        .home-link {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .home-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .home-link a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
 <body>
-    <h2>Login</h2>
-    {% if msg %}
-        <p style="color:red;">{{ msg }}</p>
-    {% endif %}
-    <form method="post" action="/login">
-        <label>Username: <input type="text" name="username" required></label><br><br>
-        <label>Password: <input type="password" name="password" required></label><br><br>
-        <button type="submit">Login</button>
-    </form>
-    <p><a href="/">Home</a></p>
+    <div class="container-card">
+        <h2 class="page-header">Login</h2>
+        
+        {% if msg %}
+            <p class="error-message">{{ msg }}</p>
+        {% endif %}
+        
+        <form method="post" action="/login">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn-submit">Login</button>
+        </form>
+        
+        <p class="home-link"><a href="/">Back to Home</a></p>
+    </div>
 </body>
 </html>

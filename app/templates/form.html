@@ -1,61 +1,250 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Function Roles</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Function Roles & Arguments Setup</title>
+    
+    <style>
+        /* Base Styles and Custom Font */
+        body {
+            font-family: Arial, sans-serif; /* Fallback for Inter */
+            background-color: #f7f9fb; /* Light background */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align content to the top */
+            padding: 32px 16px; /* Responsive padding */
+        }
+
+        /* Container Card Styling */
+        .container-card {
+            width: 100%;
+            max-width: 512px; /* max-w-lg equivalent */
+            background-color: #ffffff;
+            padding: 32px; /* p-8 equivalent */
+            border-radius: 12px; /* rounded-xl equivalent */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-2xl equivalent */
+            display: flex;
+            flex-direction: column;
+            gap: 32px; /* space-y-8 equivalent */
+        }
+
+        /* Header Styling */
+        .main-header {
+            font-size: 28px; /* text-3xl equivalent */
+            font-weight: 800; /* font-extrabold equivalent */
+            color: #1f2937; /* text-gray-800 equivalent */
+            text-align: center;
+            margin-bottom: 40px; /* mb-10 equivalent */
+        }
+
+        /* Step Section Styling */
+        .step-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px; /* space-y-6 equivalent */
+        }
+        
+        /* Step Header */
+        .step-header {
+            font-size: 20px; /* text-xl equivalent */
+            font-weight: 600; /* font-semibold equivalent */
+            color: #374151; /* text-gray-700 equivalent */
+            border-bottom: 1px solid #e5e7eb; /* border-b pb-2 equivalent */
+            padding-bottom: 8px;
+        }
+
+        /* Form Layout */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px; /* space-y-4 equivalent */
+        }
+
+        /* Input and Label Styling */
+        label {
+            display: block;
+            font-size: 14px; /* text-sm equivalent */
+            font-weight: 500; /* font-medium equivalent */
+            color: #4b5563; /* text-gray-600 equivalent */
+            margin-bottom: 4px; /* mb-1 equivalent */
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px 12px; /* px-3 py-2 equivalent */
+            border: 1px solid #d1d5db; /* border equivalent */
+            border-radius: 8px; /* rounded-lg equivalent */
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #3b82f6; /* Blue focus ring */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+            outline: none;
+        }
+
+        /* Specific style for Step 2 argument input */
+        .arg-input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .arg-input-row label {
+            flex-basis: 50%; /* w-1/2 equivalent */
+            margin-right: 16px; /* mr-4 equivalent */
+        }
+        .arg-input-row input[type="number"] {
+            text-align: right;
+        }
+
+
+        /* Button Styling - Blue (Next/Finish) */
+        .btn-primary {
+            width: 100%;
+            background-color: #2563eb; /* bg-blue-600 equivalent */
+            color: white;
+            font-weight: 700; /* font-bold equivalent */
+            padding: 8px 16px; /* py-2 px-4 equivalent */
+            border-radius: 8px; /* rounded-lg equivalent */
+            transition: background-color 0.15s, box-shadow 0.15s;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-md equivalent */
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8; /* hover:bg-blue-700 equivalent */
+        }
+
+        /* Button Styling - Green (Generate Key) */
+        .btn-success {
+            width: 100%;
+            background-color: #10b981; /* bg-green-600 equivalent */
+            color: white;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background-color 0.15s, box-shadow 0.15s;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .btn-success:hover {
+            background-color: #059669; /* hover:bg-green-700 equivalent */
+        }
+
+        /* API Key Display */
+        .api-key-display {
+            font-size: 24px; /* text-2xl equivalent */
+            font-family: 'Courier New', monospace; /* font-mono equivalent */
+            color: #059669; /* text-green-600 equivalent */
+            background-color: #f0fdf4; /* bg-green-50 equivalent */
+            padding: 12px; /* p-3 equivalent */
+            border-radius: 8px; /* rounded-lg equivalent */
+            border: 1px solid #d1fae5; /* border border-green-200 equivalent */
+            word-break: break-all;
+        }
+        .placeholder-text {
+            font-size: 18px; /* text-lg equivalent */
+            color: #6b7280; /* text-gray-500 equivalent */
+        }
+    </style>
 </head>
-<body>
-    {% if roles_msg %}
-    <h2>Step 1: Define Roles of Each Function</h2>
-    <form action="/roles" method="post">
-        <label>Function Names (comma-separated):</label><br>
-        <input type="text" name="functions" required><br><br>
-        
-        <label>Roles (comma-separated, match order):</label><br>
-        <input type="text" name="roles" required><br><br>
-        
-        <button type="submit">Next</button>
-    </form>
-    {% endif %}
+<body class="min-h-screen flex items-start justify-center p-4 sm:p-8">
+    <div class="container-card">
+        <h1 class="main-header">
+            Function Metadata Builder
+        </h1>
 
-    {% if arg_counts_msg %}
-    <h2>Step 2: Enter Number of Arguments for Each Function</h2>
-    <form action="/arg_counts" method="application/x-www-form-urlencoded">
-        {% for func in functions %}
-            <label>{{ func }}:</label>
-            <input type="number" name="{{ func }}" min="0" required><br><br>
-        {% endfor %}
-        <button type="submit">Next</button>
-    </form>
-    {% endif %}
+        <!-- Step 1: Define Roles -->
+        {% if roles_msg %}
+        <div id="step-1" class="step-section">
+            <h2 class="step-header">Step 1: Define Roles of Each Function</h2>
+            <form action="/roles" method="post">
+                <div>
+                    <label for="functions">Function Names (comma-separated):</label>
+                    <input type="text" id="functions" name="functions" required>
+                </div>
+                <div>
+                    <label for="roles">Roles (comma-separated, match order):</label>
+                    <input type="text" id="roles" name="roles" required>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    Next
+                </button>
+            </form>
+        </div>
+        {% endif %}
 
-    {% if arg_names_msg %}
-    <h2>Step 3: Enter Arguments Each Function (comma-separated)</h2>
-    <form action="/arg_names" method="application/x-www-form-urlencoded">
-        {% for func in functions %}
-            <label>{{ func }}:</label>
-            <input type="text" name="{{ func }}" placeholder="arg1, arg2, arg3" required><br><br>
-        {% endfor %}
-        <button type="submit">Next</button>
-    </form>
-    {% endif %}
+        <!-- Step 2: Enter Number of Arguments -->
+        {% if arg_counts_msg %}
+        <div id="step-2" class="step-section">
+            <h2 class="step-header">Step 2: Enter Number of Arguments for Each Function</h2>
+            <form action="/arg_counts" method="application/x-www-form-urlencoded">
+                {% for func in functions %}
+                    <div class="arg-input-row">
+                        <label>{{ func }}:</label>
+                        <input type="number" name="{{ func }}" min="0" required>
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn-primary">
+                    Next
+                </button>
+            </form>
+        </div>
+        {% endif %}
 
-    {% if arg_meaning %}
-    <h2>step4: enter the roles of Argument(comma-separated)</h2>
-    <form action="/arg_roles" method="application/x-www-form-urlencoded">
-        {% for func in functions %}
-            <label>{{ func }}:</label>
-            <input type="text" name="{{ func }}" placeholder="arg1, arg2, arg3" required><br><br>
-        {% endfor %}
-        <button type="submit">Finish</button>
-    </form>
-    {% endif %}
+        <!-- Step 3: Enter Argument Names -->
+        {% if arg_names_msg %}
+        <div id="step-3" class="step-section">
+            <h2 class="step-header">Step 3: Enter Arguments for Each Function (comma-separated)</h2>
+            <form action="/arg_names" method="application/x-www-form-urlencoded">
+                {% for func in functions %}
+                    <div>
+                        <label for="{{ func }}_names">{{ func }}:</label>
+                        <input type="text" id="{{ func }}_names" name="{{ func }}" placeholder="arg1, arg2, arg3" required>
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn-primary">
+                    Next
+                </button>
+            </form>
+        </div>
+        {% endif %}
 
-    {% if api_key %}
-    <h2>Generate the api_key</h2>
-    <form action="/api_key" method="post">
-            <h2>{{key}}</h2>
-            <button type="submit">Finish</button>
-    </form>
-    {% endif %}
+        <!-- Step 4: Enter Argument Meanings/Roles -->
+        {% if arg_meaning %}
+        <div id="step-4" class="step-section">
+            <h2 class="step-header">Step 4: Enter the Roles of Arguments (comma-separated)</h2>
+            <form action="/arg_roles" method="application/x-www-form-urlencoded">
+                {% for func in functions %}
+                    <div>
+                        <label for="{{ func }}_roles">{{ func }}:</label>
+                        <input type="text" id="{{ func }}_roles" name="{{ func }}" placeholder="Role of arg1, Role of arg2, Role of arg3" required>
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn-primary">
+                    Finish
+                </button>
+            </form>
+        </div>
+        {% endif %}
 
+        <!-- API Key Generation -->
+        {% if api_key %}
+        <div id="step-api-key" class="step-section" style="text-align: center;">
+            <h2 class="step-header">Generate the API Key</h2>
+            <form action="/api_key" method="post">
+                <!-- Display the generated key if it exists -->
+                {% if key %}
+                <h2 class="api-key-display">{{ key }}</h2>
+                {% else %}
+                <h2 class="placeholder-text">Key will appear here after generation.</h2>
+                {% endif %}
+
+                <button type="submit" class="btn-success">
+                    Generate API Key
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>
