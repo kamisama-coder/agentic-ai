@@ -1,6 +1,4 @@
 from google import generativeai
-import threading
-import importlib.util
 import torch
 import json
 import requests
@@ -44,15 +42,9 @@ def safe_convert(value):
 
 
 class Controller:
-        def __init__(self,start,api_key,filename,type):
+        def __init__(self,start,api_key):
             self.check = self.valid_apitoken(api_key)
             if self.check:   
-                spec = importlib.util.spec_from_file_location("file1",filename)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-                
-                self.type = type
-                self.module_dict = vars(module)
                 self.store = {}
                 self.repsonse = {}
                 self.slow_save = []
@@ -77,74 +69,230 @@ class Controller:
         def decrease_token(self):
             headers = {"Authorization": f"token {self.api_key}"}
             requests.get("http://localhost:8000/decrease_token",headers=headers)
-            
 
-        def connect_database(self):
+
+        def update_database(self): 
             headers = {"Authorization": f"token {self.api_key}"}
             response = requests.get("http://localhost:8000/connect",headers=headers)
-            self.instruction = response.json()
-            print(self.instruction)
-#             self.instruction = {
-#     "functions": {
-#         "part1": {
-#             "role": "LLM task",
-#             "description": "Send a prompt to the Google Generative AI (Gemini) model and return a text response.",
-#             "args": {
-#                 "prompt": {
-#                     "type": "str",
-#                     "description": "The natural language prompt to send to the LLM."
-#                 }
-#             },
-#             "arg_count": 1,
-#             "return_type": "str",
-#             "example": 'part1("Write a poem about the ocean.")'
-#         },
-#         "get_text_embedding": {
-#             "role": "Text embedding",
-#             "description": "Encodes input text into a normalized CLIP embedding vector.",
-#             "args": {
-#                 "statement": {
-#                     "type": "str",
-#                     "description": "The input text to convert into embeddings."
-#                 }
-#             },
-#             "arg_count": 1,
-#             "return_type": "torch.Tensor (1, hidden_dim)",
-#             "example": 'get_text_embedding("A cat sitting on a sofa.")'
-#         },
-#         "get_image_embedding": {
-#             "role": "Image embedding",
-#             "description": "Encodes an image into a normalized CLIP embedding vector.",
-#             "args": {
-#                 "image_path": {
-#                     "type": "str",
-#                     "description": "Path to the image file (e.g., .jpg or .png)."
-#                 }
-#             },
-#             "arg_count": 1,
-#             "return_type": "torch.Tensor (1, hidden_dim)",
-#             "example": 'get_image_embedding(r"C:/Users/ASUS/Downloads/saas/app/chinese vase.jpg")'
-#         },
-#         "cosine_similarity": {
-#             "role": "Similarity scoring",
-#             "description": "Computes cosine similarity between two embeddings.",
-#             "args": {
-#                 "embedding1": {
-#                     "type": "torch.Tensor",
-#                     "description": "First embedding (e.g., text)."
-#                 },
-#                 "embedding2": {
-#                     "type": "torch.Tensor",
-#                     "description": "Second embedding (e.g., image)."
-#                 }
-#             },
-#             "arg_count": 2,
-#             "return_type": "float",
-#             "example": "cosine_similarity(text_emb, img_emb)"
-#         }
-#     },
-#     "instruction_version": "1.1"
-# }
+            response = response.json()  
+            self.instruction["functions"].update(response)
+
+
+        def connect_database(self):
+            self.instruction = {
+    "functions": {
+        "run_sql_query": {
+            "role": "Database query",
+            "description": "Executes a SQL query against a database using SQLAlchemy and returns the result as a Pandas DataFrame.",
+            "args": {
+                "connection_string": {
+                    "type": "str",
+                    "description": "A valid SQLAlchemy connection string (e.g., 'postgresql://user:pass@host:5432/db')."
+                },
+                "query": {
+                    "type": "str",
+                    "description": "SQL query to execute."
+                }
+            },
+            "arg_count": 2,
+            "return_type": "pd.DataFrame",
+            "example": "run_sql_query('postgresql://user:pass@localhost:5432/mydb', 'SELECT * FROM sales;')"
+        },
+        "load_csv_from_s3": {
+            "role": "Data loading",
+            "description": "Loads a CSV file from an AWS S3 bucket into a Pandas DataFrame.",
+            "args": {
+                "bucket": {"type": "str", "description": "S3 bucket name."},
+                "key": {"type": "str", "description": "Key (path) to the CSV file in the bucket."},
+                "separator": {"type": "str", "description": "CSV delimiter (default ',')."}
+            },
+            "arg_count": 3,
+            "return_type": "pd.DataFrame",
+            "example": "load_csv_from_s3('my-bucket', 'data/sales.csv', ',')"
+        },
+        "handle_missing_values": {
+            "role": "Data cleaning",
+            "description": "Handles missing values in a specified column using strategies like 'drop', 'fill', 'mean', 'median'.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "column": {"type": "str", "description": "Column to clean."},
+                "strategy": {"type": "str", "description": "Strategy for handling missing values."},
+                "fill_value": {"type": "any", "description": "Fill value if strategy='fill'."}
+            },
+            "arg_count": 4,
+            "return_type": "pd.DataFrame",
+            "example": "handle_missing_values(df, 'price', 'mean')"
+        },
+        "remove_duplicates": {
+            "role": "Data cleaning",
+            "description": "Removes duplicate rows from a DataFrame.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."}
+            },
+            "arg_count": 1,
+            "return_type": "pd.DataFrame",
+            "example": "remove_duplicates(df)"
+        },
+        "change_column_type": {
+            "role": "Data transformation",
+            "description": "Converts the data type of a column to integer, float, string, or datetime.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "column": {"type": "str", "description": "Column to convert."},
+                "new_type": {"type": "str", "description": "Target type: 'integer', 'float', 'string', 'datetime'."}
+            },
+            "arg_count": 3,
+            "return_type": "pd.DataFrame",
+            "example": "change_column_type(df, 'date', 'datetime')"
+        },
+        "rename_columns": {
+            "role": "Data transformation",
+            "description": "Renames one or more columns in a DataFrame.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "rename_map": {"type": "dict", "description": "Mapping of old to new column names."}
+            },
+            "arg_count": 2,
+            "return_type": "pd.DataFrame",
+            "example": "rename_columns(df, {'old': 'new'})"
+        },
+        "filter_rows": {
+            "role": "Data filtering",
+            "description": "Filters rows in a DataFrame based on a condition.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "column": {"type": "str", "description": "Column to filter."},
+                "operator": {"type": "str", "description": "Operator (==, !=, >, <, >=, <=, contains)."},
+                "value": {"type": "any", "description": "Value for comparison."}
+            },
+            "arg_count": 4,
+            "return_type": "pd.DataFrame",
+            "example": "filter_rows(df, 'price', '>', 100)"
+        },
+        "select_columns": {
+            "role": "Data selection",
+            "description": "Keeps only the specified columns in the DataFrame.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "columns_to_keep": {"type": "list", "description": "List of columns to retain."}
+            },
+            "arg_count": 2,
+            "return_type": "pd.DataFrame",
+            "example": "select_columns(df, ['id', 'price'])"
+        },
+        "join_dataframes": {
+            "role": "Data merging",
+            "description": "Joins two DataFrames on a common column using inner, left, right, or outer join.",
+            "args": {
+                "df1": {"type": "pd.DataFrame", "description": "First DataFrame."},
+                "df2": {"type": "pd.DataFrame", "description": "Second DataFrame."},
+                "on_column": {"type": "str", "description": "Join key column."},
+                "how": {"type": "str", "description": "Join type (default 'inner')."}
+            },
+            "arg_count": 4,
+            "return_type": "pd.DataFrame",
+            "example": "join_dataframes(df1, df2, 'id', 'left')"
+        },
+        "group_by_aggregate": {
+            "role": "Data aggregation",
+            "description": "Groups a DataFrame by a column and aggregates another column with sum, mean, count, std, min, or max.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "group_by_col": {"type": "str", "description": "Column to group by."},
+                "agg_col": {"type": "str", "description": "Column to aggregate."},
+                "agg_func": {"type": "str", "description": "Aggregation function."}
+            },
+            "arg_count": 4,
+            "return_type": "pd.DataFrame",
+            "example": "group_by_aggregate(df, 'category', 'sales', 'sum')"
+        },
+        "sort_values": {
+            "role": "Data sorting",
+            "description": "Sorts a DataFrame by a column.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "by_column": {"type": "str", "description": "Column to sort by."},
+                "ascending": {"type": "bool", "description": "Sort ascending (default False)."}
+            },
+            "arg_count": 3,
+            "return_type": "pd.DataFrame",
+            "example": "sort_values(df, 'sales', ascending=True)"
+        },
+        "get_descriptive_statistics": {
+            "role": "Data analysis",
+            "description": "Calculates descriptive statistics (mean, median, std, min, max, count) for a numeric column.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "column": {"type": "str", "description": "Numeric column for stats."}
+            },
+            "arg_count": 2,
+            "return_type": "dict",
+            "example": "get_descriptive_statistics(df, 'price')"
+        },
+        "display_stats": {
+            "role": "Data visualization / reporting",
+            "description": "Displays the contents of a descriptive statistics dictionary in a readable format, with an optional title.",
+            "args": {
+                "stats": {"type": "dict", "description": "Dictionary containing descriptive statistics."},
+                "title": {"type": "str", "description": "Optional title to display above the statistics."}
+            },
+            "arg_count": 2,
+            "return_type": "None (prints statistics to console)",
+            "example": "display_stats(stats, title='Daily Sales Statistics')"
+        },
+        "display_head": {
+            "role": "Data inspection",
+            "description": "Displays the first N rows of a DataFrame for inspection.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "n": {"type": "int", "description": "Number of rows to display."}
+            },
+            "arg_count": 2,
+            "return_type": "pd.DataFrame",
+            "example": "display_head(df, 5)"
+        },
+        "plot_bar_chart": {
+            "role": "Data visualization",
+            "description": "Plots a bar chart from the DataFrame.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "x_col": {"type": "str", "description": "X-axis column."},
+                "y_col": {"type": "str", "description": "Y-axis column."},
+                "title": {"type": "str", "description": "Chart title."}
+            },
+            "arg_count": 4,
+            "return_type": "None (displays chart)",
+            "example": "plot_bar_chart(df, 'category', 'sales', 'Sales by Category')"
+        },
+        "plot_line_chart": {
+            "role": "Data visualization",
+            "description": "Plots a line chart from the DataFrame, ideal for time-series data.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "Input DataFrame."},
+                "x_col": {"type": "str", "description": "X-axis column."},
+                "y_col": {"type": "str", "description": "Y-axis column."},
+                "title": {"type": "str", "description": "Chart title."}
+            },
+            "arg_count": 4,
+            "return_type": "None (displays chart)",
+            "example": "plot_line_chart(df, 'date', 'daily_sales', 'Daily Sales Trend')"
+        },
+        "save_dataframe_to_csv": {
+            "role": "Data export",
+            "description": "Saves a DataFrame to a local CSV file.",
+            "args": {
+                "dataframe": {"type": "pd.DataFrame", "description": "DataFrame to save."},
+                "filename": {"type": "str", "description": "File path/name for CSV."}
+            },
+            "arg_count": 2,
+            "return_type": "None (saves file)",
+            "example": "save_dataframe_to_csv(df, 'output.csv')"
+        }
+    },
+    "instruction_version": "1.1"
+}
+
+
 
         def valid_apitoken(self,api_key):
             headers = {"Authorization": f"token {api_key}"}
@@ -156,6 +304,7 @@ class Controller:
             if self.instruction:
                 self.trigger(self.instruction)  
                 self.run()  
+                
 
         def trigger(self,instruction):
             prompt = f"""
@@ -164,16 +313,19 @@ class Controller:
             The query to process is "{self.start}".
 
             For each cycle:
-            1. Process the provided input according to the instruction.
-            2. If applicable, extract arguments or additional parameters from the input.
-            3. Determine the appropriate next function or AI agent to handle the processed data.
-            4. Pass the processed input to that function or agent.
-            5. Continue this process until the entire flow of instructions is completed.
-            6. Return the result strictly as a valid Python dictionary — no additional text, no explanations, no formatting other than the dictionary itself.
+                1. Process the provided input according to the instruction.
+                2. If applicable, extract arguments or additional parameters from the input.
+                3. Determine the appropriate next function or AI agent to handle the processed data.
+                4. Pass the processed input to that function or agent.
+                5. Continue this process until the entire flow of instructions is completed.
+                6. When constructing the output dictionary:
+                    - Always use the literal string 'df' for any argument named 'dataframe'.
+                    - Include only the necessary arguments and their values.
+                7. Return the result strictly as a valid Python dictionary — no additional text, explanations, or formatting other than the dictionary itself.
+                8. If all instructions are processed, respond with the string: "finished".
 
             Always return your response in the following dictionary format:
             {{
-                "output": "<processed input or transformed data>",
                 "arguments": {{ "<arg_name>": <arg_value>, ... }},
                 "function": "name of the function in which argument has to be passed"
             }}
@@ -184,8 +336,7 @@ class Controller:
 
             
         def run(self):
-         check = {}
-
+        
          while True:
 
             prompt = f"""
@@ -198,52 +349,39 @@ class Controller:
             - Return only a Python dictionary (no comments or text).
             - Do NOT use markdown formatting like ```json.
             - Output must start directly with and be valid for json.loads().
-            - Now, in the previous interaction, each function had a return part. Please use them accordingly.
-            - do not change the return type.I repeat do not change the return type when passing throgh argument
             """
 
             response = self.chat.send_message(prompt)
 
             self.response = clean_ai_output(response.text)
             if response.text == 'finished':
-                    print(self.response['output'])
                     break
 
-            for key, value in self.response.get('arguments', {}).items():
-                print(type(self.response))
-                self.response['arguments'][key] = safe_convert(value)
+            for key, value in self.response.get('arguments', {}).items():  
+                    self.response['arguments'][key] = safe_convert(value)
 
             print("Convertor Response:", self.response) 
 
             try:
 
                 if not self.response['arguments']:
-                    raise TypeError("No arguments provided")
+                    raise TypeError("No arguments provided")      
 
-                recieved_imf = self.module_dict[self.response['function']](**self.response['arguments'])
-                check['function_returned_part'] = recieved_imf
-                check['function'] = self.response['function']
-                check['return type'] = type(recieved_imf)
-                self.slow_save.append(check)
+                self.slow_save.append(self.response)
 
             except (KeyError,TypeError,AttributeError):
-                                                                                          
-                self.response['output'] = safe_convert(self.response['output'])
-                if not isinstance(self.response['output'], self.type):
-                    self.function_response = self.start
-                    self.slow_save = []
-                    continue
 
-                self.output = self.response['output']    
                 break
 
         def get_output(self):
-            return self.output
+            self.slow_save.pop(0)
+            return self.slow_save
 
 
 
-def creator(start,save_id,filename,type):    
-    return Controller(start,save_id,filename,type)    
+def creator(start,save_id,):    
+    return Controller(start,save_id)    
+
 
           
 # current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -257,8 +395,7 @@ def creator(start,save_id,filename,type):
 #     filename,
 #     float
 # )            
-
-# print(creation_obj.get_output())            
+         
             
             
 

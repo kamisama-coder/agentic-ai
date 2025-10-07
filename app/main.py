@@ -196,10 +196,10 @@ def login_post(
 
     # ✅ store session cookie
     resp: Response
-    if db.query(database.UserData).filter(database.UserData.user_id == user.id).first():
-        resp = templates.TemplateResponse("home.html", {"request": request, "api_key": True})
-    else:
-        resp = templates.TemplateResponse("form.html", {"request": request, "username": username, "roles_msg": True})
+    # if db.query(database.UserData).filter(database.UserData.user_id == user.id).first():
+    resp = templates.TemplateResponse("home.html", {"request": request, "api_key": True})
+    # else:
+    #     resp = templates.TemplateResponse("form.html", {"request": request, "username": username, "roles_msg": True})
 
     create_session(resp, user.id)  
     return resp
@@ -295,57 +295,55 @@ async def call_api(request: Request, authorization: str = Header(None)):
     try:
         params = await request.json()
         prompt = params['prompt']
-        import_lines = params['import_lines']
-        filepy_str = params['filepy']
-        return_type_str = params['return_type']
     except (json.JSONDecodeError, KeyError) as e:
         raise HTTPException(status_code=400, detail=f"Invalid or missing parameters in request body: {e}")
 
-    # --- DANGEROUS: Run module installation asynchronously ---
-    # This still carries the same severe security risk, but it will no longer block the server.
-    modules_to_install = params.get("modules", [])
-    if modules_to_install:
-        # Run all installations concurrently
-        install_tasks = [install_module(module) for module in modules_to_install]
-        await asyncio.gather(*install_tasks)
+    # # --- DANGEROUS: Run module installation asynchronously ---
+    # # This still carries the same severe security risk, but it will no longer block the server.
+    # modules_to_install = params.get("modules", [])
+    # if modules_to_install:
+    #     # Run all installations concurrently
+    #     install_tasks = [install_module(module) for module in modules_to_install]
+    #     await asyncio.gather(*install_tasks)
     
-    # --- Asynchronously write to a temporary file ---
-    temp_dir = tempfile.gettempdir()
-    temp_filename = os.path.join(temp_dir, f"{os.urandom(24).hex()}.py")
+    # # --- Asynchronously write to a temporary file ---
+    # temp_dir = tempfile.gettempdir()
+    # temp_filename = os.path.join(temp_dir, f"{os.urandom(24).hex()}.py")
     
-    try:
-        functions = json.loads(filepy_str) # This is still blocking but usually very fast
-        async with aiofiles.open(temp_filename, 'w') as f:
-            for line in import_lines:
-                await f.write(line + "\n")
-            await f.write("\n")
-            for name, code in functions.items():
-                await f.write(code + "\n\n")
+    # try:
+    #     functions = json.loads(filepy_str) # This is still blocking but usually very fast
+    #     async with aiofiles.open(temp_filename, 'w') as f:
+    #         for line in import_lines:
+    #             await f.write(line + "\n")
+    #         await f.write("\n")
+    #         for name, code in functions.items():
+    #             await f.write(code + "\n\n")
 
-        type_map = {"float": float, "int": int, "str": str}
-        real_type = type_map.get(return_type_str)
-        if real_type is None:
-            raise HTTPException(status_code=400, detail=f"Unsupported return_type: '{return_type_str}'")
+    #     type_map = {"float": float, "int": int, "str": str}
+    #     real_type = type_map.get(return_type_str)
+    #     if real_type is None:
+    #         raise HTTPException(status_code=400, detail=f"Unsupported return_type: '{return_type_str}'")
 
-        log_stream = io.StringIO()
-        result = None
+    log_stream = io.StringIO()
+    result = None
 
-        def run_llm_logic():
+    def run_llm_logic():
             """Wrapper function for the synchronous LLM code."""
             with redirect_stdout(log_stream):
-                controller = creator(prompt, token, temp_filename, real_type)
+                controller = creator(prompt, token)
                 return controller.get_output()
 
-        # Safely run the synchronous LLM functions in a separate thread
-        result = await run_in_threadpool(run_llm_logic)
+    # Safely run the synchronous LLM functions in a separate thread
+    result = await run_in_threadpool(run_llm_logic)
 
-        logs = log_stream.getvalue().splitlines()
+    logs = log_stream.getvalue().splitlines()
 
-        return {"result": result, "logs": logs}
-    finally:
-        # Cleanup the temporary file
-        if os.path.exists(temp_filename):
-            os.remove(temp_filename)
+    return result
+
+    # finally:
+    #     # Cleanup the temporary file
+    #     if os.path.exists(temp_filename):
+    #         os.remove(temp_filename)
     
 @app.post('/create-order',response_class=HTMLResponse)
 def payment(amount:int):
