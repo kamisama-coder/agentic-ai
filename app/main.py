@@ -21,7 +21,7 @@ import asyncio # Import asyncio for running subprocesses
 import aiofiles 
 from fastapi.concurrency import run_in_threadpool 
 import sys
-from llm import creator 
+from . import llm 
 import tempfile
 from contextlib import redirect_stdout
 import time
@@ -339,7 +339,7 @@ async def call_api(request: Request, authorization: str = Header(None)):
     def run_llm_logic():
             """Wrapper function for the synchronous LLM code."""
             with redirect_stdout(log_stream):
-                controller = creator(prompt, token)
+                controller = llm.creator(prompt, token)
                 return controller.get_output()
 
     # Safely run the synchronous LLM functions in a separate thread
