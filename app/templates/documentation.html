@@ -78,6 +78,11 @@
             <li><strong>address</strong>: URL endpoint to which the POST request should be sent.</li>
             <li><strong>vars</strong>: Variables that should be returned(should be a pythonic list)</li>
         </ul>
+        
+        <div class="highlight">
+        <strong>Note:</strong> Variables listed in <code>vars</code> will only be returned if they are <em>used</em> or <em>defined</em> within the <code>rules</code> prompt. 
+        Make sure to reference each variable in your rules logic to ensure their values are properly stored and accessible.
+        </div>
     </div>
 
     <div class="section">
