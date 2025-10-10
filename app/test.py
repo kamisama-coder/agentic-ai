@@ -6,7 +6,6 @@ import clip
 import os
 
 
-
 def get_clip_model():
     import clip
     import torch
