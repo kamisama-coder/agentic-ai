@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Utility Functions Documentation</title>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f6fa; color: #333; margin: 0; }
+    header { background-color: #6c5ce7; color: white; padding: 1rem 2rem; text-align: center; }
+    h1, h2, h3 { margin: 0.5rem 0; }
+    .container { max-width: 1200px; margin: auto; padding: 2rem; }
+    .function { background-color: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .function h2 { color: #6c5ce7; }
+    .args, .example, .description, .return_type { margin-top: 1rem; }
+    .args ul { list-style-type: none; padding-left: 0; }
+    .args li { padding: 0.2rem 0; }
+    code { background-color: #dfe6e9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; }
+    pre { background-color: #dfe6e9; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+    .footer { text-align: center; padding: 2rem; font-size: 0.9rem; color: #888; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Data Utility Functions Documentation</h1>
+    <p>Complete guide for loading, cleaning, analyzing, visualizing, and exporting data</p>
+</header>
+
+<div class="container">
+
+<!-- Function Template -->
+<div class="function">
+<h2>run_sql_query(connection_string, query)</h2>
+<div class="description"><strong>Role:</strong> Database query<br><strong>Description:</strong> Executes a SQL query against a database using SQLAlchemy and returns the result as a Pandas DataFrame.</div>
+<div class="args">
+<ul>
+<li><code>connection_string</code> (str): SQLAlchemy connection string</li>
+<li><code>query</code> (str): SQL query to execute</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>run_sql_query('postgresql://user:pass@localhost:5432/mydb', 'SELECT * FROM sales;')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>load_csv_from_s3(bucket, key, separator=',')</h2>
+<div class="description"><strong>Role:</strong> Data loading<br><strong>Description:</strong> Loads a CSV file from an AWS S3 bucket into a Pandas DataFrame.</div>
+<div class="args">
+<ul>
+<li><code>bucket</code> (str): S3 bucket name</li>
+<li><code>key</code> (str): Key (path) to the CSV file in the bucket</li>
+<li><code>separator</code> (str): CSV delimiter (default ',')</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>load_csv_from_s3('my-bucket', 'data/sales.csv', ',')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>handle_missing_values(dataframe, column, strategy, fill_value=None)</h2>
+<div class="description"><strong>Role:</strong> Data cleaning<br><strong>Description:</strong> Handles missing values in a specified column using strategies like 'drop', 'fill', 'mean', 'median'.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>column</code> (str): Column to clean</li>
+<li><code>strategy</code> (str): Strategy for handling missing values ('drop', 'fill', 'mean', 'median')</li>
+<li><code>fill_value</code> (any): Value to fill if strategy='fill'</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>handle_missing_values(df, 'price', 'mean')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>remove_duplicates(dataframe)</h2>
+<div class="description"><strong>Role:</strong> Data cleaning<br><strong>Description:</strong> Removes duplicate rows from a DataFrame.</div>
+<div class="args"><ul><li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li></ul></div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>remove_duplicates(df)</code></pre></div>
+</div>
+
+<div class="function">
+<h2>change_column_type(dataframe, column, new_type)</h2>
+<div class="description"><strong>Role:</strong> Data transformation<br><strong>Description:</strong> Converts the data type of a column to integer, float, string, or datetime.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>column</code> (str): Column to convert</li>
+<li><code>new_type</code> (str): Target type: 'integer', 'float', 'string', 'datetime'</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>change_column_type(df, 'date', 'datetime')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>rename_columns(dataframe, rename_map)</h2>
+<div class="description"><strong>Role:</strong> Data transformation<br><strong>Description:</strong> Renames one or more columns in a DataFrame.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>rename_map</code> (dict): Mapping of old to new column names</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>rename_columns(df, {'old':'new'})</code></pre></div>
+</div>
+
+<div class="function">
+<h2>filter_rows(dataframe, column, operator, value)</h2>
+<div class="description"><strong>Role:</strong> Data filtering<br><strong>Description:</strong> Filters rows in a DataFrame based on a condition.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>column</code> (str): Column to filter</li>
+<li><code>operator</code> (str): Operator (==, !=, >, <, >=, <=, contains)</li>
+<li><code>value</code> (any): Value for comparison</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>filter_rows(df, 'price', '>', 100)</code></pre></div>
+</div>
+
+<div class="function">
+<h2>select_columns(dataframe, columns_to_keep)</h2>
+<div class="description"><strong>Role:</strong> Data selection<br><strong>Description:</strong> Keeps only the specified columns in the DataFrame.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>columns_to_keep</code> (list): Columns to retain</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>select_columns(df, ['id','price'])</code></pre></div>
+</div>
+
+<div class="function">
+<h2>join_dataframes(df1, df2, on_column, how='inner')</h2>
+<div class="description"><strong>Role:</strong> Data merging<br><strong>Description:</strong> Joins two DataFrames on a common column using inner, left, right, or outer join.</div>
+<div class="args">
+<ul>
+<li><code>df1</code> (pd.DataFrame): First DataFrame</li>
+<li><code>df2</code> (pd.DataFrame): Second DataFrame</li>
+<li><code>on_column</code> (str): Join key column</li>
+<li><code>how</code> (str): Join type ('inner','left','right','outer')</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>join_dataframes(df1, df2, 'id', 'left')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>group_by_aggregate(dataframe, group_by_col, agg_col, agg_func)</h2>
+<div class="description"><strong>Role:</strong> Data aggregation<br><strong>Description:</strong> Groups a DataFrame by a column and aggregates another column using sum, mean, count, std, min, or max.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>group_by_col</code> (str): Column to group by</li>
+<li><code>agg_col</code> (str): Column to aggregate</li>
+<li><code>agg_func</code> (str): Aggregation function</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>group_by_aggregate(df, 'category', 'sales', 'sum')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>sort_values(dataframe, by_column, ascending=False)</h2>
+<div class="description"><strong>Role:</strong> Data sorting<br><strong>Description:</strong> Sorts a DataFrame by a column.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>by_column</code> (str): Column to sort by</li>
+<li><code>ascending</code> (bool): Sort ascending (default False)</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>sort_values(df, 'sales', ascending=True)</code></pre></div>
+</div>
+
+<div class="function">
+<h2>get_descriptive_statistics(dataframe, column)</h2>
+<div class="description"><strong>Role:</strong> Data analysis<br><strong>Description:</strong> Calculates descriptive statistics (mean, median, std, min, max, count) for a numeric column.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>column</code> (str): Numeric column for stats</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> dict</div>
+<div class="example"><pre><code>get_descriptive_statistics(df, 'price')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>display_stats(stats, title=None)</h2>
+<div class="description"><strong>Role:</strong> Data visualization / reporting<br><strong>Description:</strong> Displays the contents of a descriptive statistics dictionary in a readable format, with an optional title.</div>
+<div class="args">
+<ul>
+<li><code>stats</code> (dict): Dictionary containing descriptive statistics</li>
+<li><code>title</code> (str, optional): Title to display above the statistics</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> None (prints statistics)</div>
+<div class="example"><pre><code>display_stats(stats, title='Daily Sales Statistics')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>display_head(dataframe, n=5)</h2>
+<div class="description"><strong>Role:</strong> Data inspection<br><strong>Description:</strong> Displays the first N rows of a DataFrame for inspection.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>n</code> (int): Number of rows to display</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> pd.DataFrame</div>
+<div class="example"><pre><code>display_head(df, 5)</code></pre></div>
+</div>
+
+<div class="function">
+<h2>plot_bar_chart(dataframe, x_col, y_col, title)</h2>
+<div class="description"><strong>Role:</strong> Data visualization<br><strong>Description:</strong> Plots a bar chart from the DataFrame.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>x_col</code> (str): X-axis column</li>
+<li><code>y_col</code> (str): Y-axis column</li>
+<li><code>title</code> (str): Chart title</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> None (displays chart)</div>
+<div class="example"><pre><code>plot_bar_chart(df, 'category', 'sales', 'Sales by Category')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>plot_line_chart(dataframe, x_col, y_col, title)</h2>
+<div class="description"><strong>Role:</strong> Data visualization<br><strong>Description:</strong> Plots a line chart from the DataFrame, ideal for time-series data.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): Input DataFrame</li>
+<li><code>x_col</code> (str): X-axis column</li>
+<li><code>y_col</code> (str): Y-axis column</li>
+<li><code>title</code> (str): Chart title</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> None (displays chart)</div>
+<div class="example"><pre><code>plot_line_chart(df, 'date', 'daily_sales', 'Daily Sales Trend')</code></pre></div>
+</div>
+
+<div class="function">
+<h2>save_dataframe_to_csv(dataframe, filename)</h2>
+<div class="description"><strong>Role:</strong> Data export<br><strong>Description:</strong> Saves a DataFrame to a local CSV file.</div>
+<div class="args">
+<ul>
+<li><code>dataframe</code> (pd.DataFrame): DataFrame to save</li>
+<li><code>filename</code> (str): File path/name for CSV</li>
+</ul>
+</div>
+<div class="return_type"><strong>Return Type:</strong> None (saves file)</div>
+<div class="example"><pre><code>save_dataframe_to_csv(df, 'output.csv')</code></pre></div>
+</div>
+
+</div>
+
+<div class="footer">
+    &copy; 2025 Data Utility Functions Documentation
+</div>
+
+</body>
+</html>

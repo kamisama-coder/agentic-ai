@@ -175,6 +175,15 @@ def register_post(
     create_session(resp, new_user.id)
     return resp
 
+@app.get("/documentation", response_class=HTMLResponse)
+def documentation(request: Request):
+    return templates.TemplateResponse("documentation.html", {"request": request})
+
+
+@app.get("/functions", response_class=HTMLResponse)
+def documentation(request: Request):
+    return templates.TemplateResponse("functions.html", {"request": request})
+
 
 @app.get("/login", response_class=HTMLResponse)
 def login_get(request: Request):

@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: unit_saas
+Version: 0.2.0
+Summary: My SAAS internal package
+Author: Sanidhya Agrawal
+Author-email: Sanidhya <sanidhyaagrawal2002@gmail.com>
+License-Expression: MIT
+Requires-Python: >=3.8
+Dynamic: author
+Dynamic: requires-python

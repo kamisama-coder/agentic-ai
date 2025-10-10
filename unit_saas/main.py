@@ -386,34 +386,26 @@ def save_dataframe_to_csv(dataframe: pd.DataFrame, filename: str):
         print(f"❌ An error occurred while saving the file: {e}")    
 
 
-if __name__ == "__main__":
+def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: str=None,address: str="http://localhost:8000/call",vars: list=[]):
     # Create a sample DataFrame
-    data = {
-        'date': pd.to_datetime(['2025-10-01', '2025-10-02', '2025-10-03', '2025-10-04', '2025-10-05']),
-        'category': ['A', 'B', 'A', 'C', 'B'],
-        'daily_sales': [200, 250, 220, 300, 280]
-    }
-    df = pd.DataFrame(data)
+
+    df = None
+    if frame is not None:
+        df = frame
+
+    elif data is not None:
+        df = pd.DataFrame(data)
 
 
     params = {
-    "prompt": """Take the DataFrame df and perform the following steps:
-
-1. Calculate descriptive statistics (mean, median, std, min, max, count) for the column 'daily_sales' and store the result in a variable called 'sales_stats'.
-
-2. Display the contents of 'sales_stats'.
-
-3. Identify any missing values in the column 'daily_sales' and handle them by filling with 0, storing the updated DataFrame in a variable called 'df_filled'.
-
-4. Display the first 5 rows of 'df_filled'.
-"""
+    "prompt": rules
 }
 
 
 
-    headers = {"Authorization": "token aa47fcb7de42ea818c32fb81f8087089faad90d13de7b5fe4cce2be0ae820ae7"}
+    headers = {"Authorization": f"token {security_token}"}
 
-    response = requests.post("http://localhost:8000/call",json=params,headers=headers)
+    response = requests.post(url=address,json=params,headers=headers)
     response = response.json()
     print("LLM Response:", response)
 
@@ -463,7 +455,8 @@ if __name__ == "__main__":
 
         store[func_name] = result
 
-
+    for it in vars:
+        yield store[it]
     
     # # 1. Display the head of the DataFrame to inspect it
     # display_head(df, n=3)

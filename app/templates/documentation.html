@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>unit_saas Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9fb;
+            margin: 0;
+            padding: 40px;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            position: relative;
+        }
+        code {
+            color: #c7254e;
+            background-color: #f9f2f4;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .highlight {
+            background-color: #eef9f3;
+            border-left: 5px solid #2ecc71;
+            padding: 10px 15px;
+            border-radius: 6px;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #2c3e50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>unit_saas Documentation</h1>
+    <p><strong>unit_saas</strong> is a Python library that provides an easy way to process data frames and structured content using dynamic rule-based prompts.</p>
+
+    <div class="section">
+        <h2>Installation</h2>
+        <pre><button class="copy-btn" data-target="install-code">Copy</button><code id="install-code">pip install unit_saas</code></pre>
+    </div>
+
+    <div class="section">
+        <h2>Import</h2>
+        <pre><button class="copy-btn" data-target="import-code">Copy</button><code id="import-code">from unit_saas import loader</code></pre>
+    </div>
+
+    <div class="section">
+        <h2>Function: <code>loader</code></h2>
+        <p>The <code>loader</code> function is the core of <strong>unit_saas</strong>. It processes data frames and dictionaries according to a set of rules and sends the processed result to a specified endpoint.</p>
+
+        <h3>Arguments</h3>
+        <ul>
+            <li><strong>security_token</strong>: Token generated using the API key for authentication.</li>
+            <li><strong>frame</strong>: Pandas DataFrame to process.</li>
+            <li><strong>data</strong>: Dictionary containing the content (either <code>frame</code> or <code>data</code> can be <code>None</code>).</li>
+            <li><strong>rules</strong>: Prompt containing the steps or logic to apply to the data.</li>
+            <li><strong>address</strong>: URL endpoint to which the POST request should be sent.</li>
+            <li><strong>vars</strong>: Variables that should be returned</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Example Usage</h2>
+        <pre><button class="copy-btn" data-target="example-code">Copy</button><code id="example-code">from unit_saas import loader
+
+if __name__ == "__main__":
+
+    rules =  """Take the DataFrame df and perform the following steps:
+
+1. Display the first 5 rows of df.
+
+2. Handle any missing values in the column 'Age' by filling them with the mean of the column, storing the updated DataFrame in a variable called 'df_filled'.
+
+3. Remove any duplicate rows from 'df_filled', storing the result in 'df_no_duplicates'.
+
+4. Change the data type of the column 'Age' in 'df_no_duplicates' to integer, storing the result in 'df_typed'.
+
+5. Filter 'df_typed' to include only rows where 'Is_Student' is True, storing the result in 'df_students'.
+
+6. Calculate descriptive statistics (mean, median, std, min, max, count) for the 'Age' column in 'df_students' and store the result in a variable called 'student_age_stats'.
+
+7. Display the contents of 'student_age_stats' with the title "Student Age Statistics".
+"""
+
+    data = {
+        'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+        'Age': [25, 30, 28, 22],
+        'City': ['New York', 'London', 'Paris', 'Tokyo'],
+        'Is_Student': [True, False, False, True]
+    }
+
+    security_token = "089f9d1475e3db7fd6ecc8a218ebd974b40f0b3fcf3d88bc6b6c9b8b6d55444c"
+
+    some_variable = loader(data=data, rules=rules, security_token=security_token)
+    for it in some_variable:
+        print(it)
+    </code></pre>
+    </div>
+
+    <script>
+        const copyButtons = document.querySelectorAll('.copy-btn');
+        copyButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.getAttribute('data-target');
+                const code = document.getElementById(targetId);
+                navigator.clipboard.writeText(code.innerText).then(() => {
+                    btn.innerText = 'Copied!';
+                    setTimeout(() => btn.innerText = 'Copy', 1500);
+                }).catch(() => {
+                    btn.innerText = 'Copy';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
