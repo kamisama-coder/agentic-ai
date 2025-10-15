@@ -313,16 +313,15 @@ class Controller:
             The query to process is "{self.start}".
 
             For each cycle:
-                1. Process the provided input according to the instruction.
-                2. If applicable, extract arguments or additional parameters from the input.
-                3. Determine the appropriate next function or AI agent to handle the processed data.
-                4. Pass the processed input to that function or agent.
-                5. Continue this process until the entire flow of instructions is completed.
-                6. When constructing the output dictionary:
-                    - Always use the literal string 'df' for any argument named 'dataframe'.
-                    - Include only the necessary arguments and their values.
-                7. Return the result strictly as a valid Python dictionary — no additional text, explanations, or formatting other than the dictionary itself.
-                8. If all instructions are processed, respond with the string: "finished".
+            1. Process the provided input according to the instruction.
+            2. If applicable, extract arguments or additional parameters from the input.
+            3. Determine the appropriate next function or AI agent to handle the processed data.
+            4. Pass the processed input to that function or agent.
+            5. Continue this process until the entire flow of instructions is completed.
+            6. Use the literal string 'df' for the dataframe argument, but change or create a new DataFrame only if the instruction explicitly requires it.
+            7. Return the result strictly as a valid Python dictionary — no additional text, explanations, or formatting other than the dictionary itself.
+            8. If all instructions are processed, respond with the string: "finished".
+
 
             Always return your response in the following dictionary format:
             {{

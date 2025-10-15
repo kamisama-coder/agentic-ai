@@ -454,9 +454,12 @@ def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: s
             raise RuntimeError(f"Error executing {func_name} with args {args}: {e}")
 
         store[func_name] = result
+        
 
-    for it in vars:
-        yield store[it]
+    if len(vars) != 0:
+        return {it: store[it] for it in vars}  # dict of requested outputs
+    else:
+        return list(store.values())[-1]      
     
     # # 1. Display the head of the DataFrame to inspect it
     # display_head(df, n=3)

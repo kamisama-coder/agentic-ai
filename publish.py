@@ -1,32 +1,28 @@
 from unit_saas import loader
+import pandas as pd
 
 if __name__ == "__main__":
 
-    rules =  """Take the DataFrame df and perform the following steps:
-
-1. Display the first 5 rows of df.
-
-2. Handle any missing values in the column 'Age' by filling them with the mean of the column, storing the updated DataFrame in a variable called 'df_filled'.
-
-3. Remove any duplicate rows from 'df_filled', storing the result in 'df_no_duplicates'.
-
-4. Change the data type of the column 'Age' in 'df_no_duplicates' to integer, storing the result in 'df_typed'.
-
-5. Filter 'df_typed' to include only rows where 'Is_Student' is True, storing the result in 'df_students'.
-
-6. Calculate descriptive statistics (mean, median, std, min, max, count) for the 'Age' column in 'df_students' and store the result in a variable called 'student_age_stats'.
-
-7. Display the contents of 'student_age_stats' with the title "Student Age Statistics".
-"""
+    rules =  "Show me total revenue per product and save it in ass and sort ass in descending and save it in meow and then print meow.note:choose the value of dataframe according to you as necessary"
 
     data = {
-    'Name': ['Alice', 'Bob', 'Charlie', 'David'],
-    'Age': [25, 30, 28, 22],
-    'City': ['New York', 'London', 'Paris', 'Tokyo'],
-    'Is_Student': [True, False, False, True]
-    }
+    "orderID": [1001, 1002, 1003, 1004, 1005, 1006, 1007],
+    "customerID": [501, 502, 503, 501, 504, 505, 502],
+    "customerName": ["Alice", "Bob", "Charlie", "Alice", "David", "Eve", "Bob"],
+    "product": ["Laptop", "Phone", "Tablet", "Laptop", "Monitor", "Phone", "Tablet"],
+    "Category": ["Electronics", "Electronics", "Electronics", "Electronics", "Electronics", "Electronics", "Electronics"],
+    "units": [2, 5, 3, 1, 4, 2, 1],
+    "unitPrice": [1200, 500, 300, 1200, 250, 500, 300],
+    "revenue": [2400, 2500, 900, 1200, 1000, 1000, 300],
+    "orderDate": pd.to_datetime([
+        "2025-01-01", "2025-01-02", "2025-01-03",
+        "2025-01-05", "2025-01-07", "2025-01-08", "2025-01-09"
+    ]),
+    "region": ["North", "South", "East", "North", "West", "South", "South"]
+}
 
-    security_token = "089f9d1475e3db7fd6ecc8a218ebd974b40f0b3fcf3d88bc6b6c9b8b6d55444c"
+    security_token = "567c211de2627104c0fd19fe3d252de7713be4d4b21dba8e7a1ba4da3f40090c"
 
-    loader(data=data,rules=rules,security_token=security_token)
+    hello_world = loader(data=data,rules=rules,security_token=security_token)
+    print(hello_world)
 
