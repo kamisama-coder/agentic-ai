@@ -68,7 +68,7 @@ class Controller:
 
         def decrease_token(self):
             headers = {"Authorization": f"token {self.api_key}"}
-            requests.get("http://localhost:8000/decrease_token",headers=headers)
+            requests.get("https://agentic-ai-nt21.onrender.com//decrease_token",headers=headers)
 
 
         def update_database(self): 
@@ -296,7 +296,7 @@ class Controller:
 
         def valid_apitoken(self,api_key):
             headers = {"Authorization": f"token {api_key}"}
-            response = requests.get("http://localhost:8000/valid",headers=headers)
+            response = requests.get("https://agentic-ai-nt21.onrender.com//valid",headers=headers)
             return response.json()['result']
         
 
