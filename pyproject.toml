@@ -4,13 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unit_saas"
-version = "0.4.0"
+version = "0.5.0"
 description = "My SAAS internal package"
 authors = [
   { name = "Sanidhya", email = "sanidhyaagrawal2002@gmail.com" }
 ]
-
-license = "MIT" 
+license =  "MIT" 
 requires-python = ">=3.8"
-dependencies = []
+dependencies = [
+  "pandas",
+  "boto3",
+  "sqlalchemy",
+  "numpy",
+  "matplotlib",
+  "requests"
+]
+
+[tool.setuptools]
+packages = ["unit_saas"]
 

@@ -21,8 +21,8 @@ if __name__ == "__main__":
     "region": ["North", "South", "East", "North", "West", "South", "South"]
 }
 
-    security_token = "567c211de2627104c0fd19fe3d252de7713be4d4b21dba8e7a1ba4da3f40090c"
+    security_token = "5263276678e234a94ae2153eada0654a7780e7344dbff0d09c0475f0e8a2d40e"
 
-    hello_world = loader(data=data,rules=rules,security_token=security_token)
+    hello_world = loader(data=data,rules=rules,security_token=security_token,address="https://agentic-ai-nt21.onrender.com/call")
     print(hello_world)
 
