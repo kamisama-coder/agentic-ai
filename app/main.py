@@ -454,7 +454,7 @@ def view_data(
         raise HTTPException(status_code=404, detail="No data found for this user")
     
     data = db.query(database.UserData).filter(database.UserData.user_id == user_data.id).first()
-    return json.loads(data.json_data)
+    return json.dumps(data.json_data)
     
     
 if __name__ == "__main__":

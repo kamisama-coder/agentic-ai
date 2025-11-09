@@ -196,7 +196,7 @@
         <!-- Step 3: Enter Argument Names -->
         {% if arg_names_msg %}
         <div id="step-3" class="step-section">
-            <h2 class="step-header">Step 3: Enter Arguments for Each Function (comma-separated)</h2>
+            <h2 class="step-header">Step 3: Enter Arguments for Function (comma-separated)</h2>
             <form action="/arg_names" method="application/x-www-form-urlencoded">
                 {% for func in functions %}
                     <div>
@@ -214,7 +214,7 @@
         <!-- Step 4: Enter Argument Meanings/Roles -->
         {% if arg_meaning %}
         <div id="step-4" class="step-section">
-            <h2 class="step-header">Step 4: Enter the Roles of Arguments (comma-separated)</h2>
+            <h2 class="step-header">Step 4: Enter the Roles of Arguments (; separated)</h2>
             <form action="/arg_roles" method="application/x-www-form-urlencoded">
                 {% for func in functions %}
                     <div>
