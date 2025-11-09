@@ -1,3 +1,3 @@
-from .main import loader
+from .loader import loader, load_user_functions
 
-__all__ = ['loader']
+__all__ = ['loader', 'load_user_functions']

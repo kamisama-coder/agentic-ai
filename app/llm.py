@@ -39,47 +39,11 @@ def safe_convert(value):
             return value
     else:
         return value   
+    
 
-
-class Controller:
-        def __init__(self,start,api_key):
-            self.check = self.valid_apitoken(api_key)
-            if self.check:   
-                self.store = {}
-                self.repsonse = {}
-                self.slow_save = []
-                self.api_key = api_key
-                self.start = start
-                generativeai.configure(api_key=os.environ.get('API_KEY'))
-                self.model = generativeai.GenerativeModel('gemini-2.5-flash')
-                self.function_response = start
-                self.instruction = None
-                self.decrease_token()
-                self.connect_database()
-                self.chat = self.model.start_chat()
-                # self.thread = threading.Thread(target=self._instruction_watcher, daemon=True)
-                # self.thread.start()      
-                if self.instruction:
-                    self.trigger(self.instruction)  
-                    self.run()   
-            else:
-                raise PermissionError("Invalid API token")
+def database():
             
-
-        def decrease_token(self):
-            headers = {"Authorization": f"token {self.api_key}"}
-            requests.get("https://agentic-ai-nt21.onrender.com//decrease_token",headers=headers)
-
-
-        def update_database(self): 
-            headers = {"Authorization": f"token {self.api_key}"}
-            response = requests.get("http://localhost:8000/connect",headers=headers)
-            response = response.json()  
-            self.instruction["functions"].update(response)
-
-
-        def connect_database(self):
-            self.instruction = {
+    return {
     "functions": {
         "run_sql_query": {
             "role": "Database query",
@@ -292,6 +256,43 @@ class Controller:
     "instruction_version": "1.1"
 }
 
+
+
+class Controller:
+        def __init__(self,start,api_key):
+            self.check = self.valid_apitoken(api_key)
+            if self.check:   
+                self.store = {}
+                self.repsonse = {}
+                self.slow_save = []
+                self.api_key = api_key
+                self.start = start
+                generativeai.configure(api_key=os.environ.get('API_KEY'))
+                self.model = generativeai.GenerativeModel('gemini-2.5-flash')
+                self.function_response = start
+                self.instruction = None
+                self.decrease_token()
+                self.connect_database()
+                self.chat = self.model.start_chat()
+                # self.thread = threading.Thread(target=self._instruction_watcher, daemon=True)
+                # self.thread.start()      
+                if self.instruction:
+                    self.trigger(self.instruction)  
+                    self.run()   
+            else:
+                raise PermissionError("Invalid API token")
+            
+
+        def decrease_token(self):
+            headers = {"Authorization": f"token {self.api_key}"}
+            requests.get("https://agentic-ai-nt21.onrender.com//decrease_token",headers=headers)
+
+
+        def connect_database(self): 
+            headers = {"Authorization": f"token {self.api_key}"}
+            response = requests.get("http://localhost:8000/connect",headers=headers)
+            response = response.json()  
+            self.instruction = response
 
 
         def valid_apitoken(self,api_key):

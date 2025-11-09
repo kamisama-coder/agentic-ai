@@ -4,8 +4,6 @@ from sqlalchemy import create_engine, text
 from botocore.exceptions import NoCredentialsError, ClientError
 import numpy as np
 import matplotlib.pyplot as plt
-import importlib.util
-import requests
 
 
 def run_sql_query(connection_string: str, query: str) -> pd.DataFrame:
@@ -384,96 +382,3 @@ def save_dataframe_to_csv(dataframe: pd.DataFrame, filename: str):
         print(f"✅ Successfully saved DataFrame to '{filename}'.")
     except Exception as e:
         print(f"❌ An error occurred while saving the file: {e}")    
-
-
-def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: str=None,address: str="http://localhost:8000/call",vars: list=[]):
-    # Create a sample DataFrame
-
-    df = None
-    if frame is not None:
-        df = frame
-
-    elif data is not None:
-        df = pd.DataFrame(data)
-
-
-    params = {
-    "prompt": rules
-}
-
-
-
-    headers = {"Authorization": f"token {security_token}"}
-
-    response = requests.post(url=address,json=params,headers=headers)
-    response = response.json()
-    print("LLM Response:", response)
-
-
-    # --------------------------
-    # Step 2: Execute functions directly
-    # --------------------------
-    store = {}
-    dataframes = {
-    'df': df 
-    }
-
-    for it in response:
-        func_name = it.get('function')
-        args = it.get('arguments', {})
-
-    
-        # Map dataframe placeholders to actual DataFrame objects
-        for key, val in args.items():
-            if key == "dataframe":
-                if val != 'df':    
-                    if val not in dataframes:
-                        dataframes[val] = list(store.values())[-1]
-                        args[key] = dataframes[val]
-
-                    else:    
-                        args[key] = dataframes[val]     
-
-                else:
-                    args[key] = dataframes[val] 
-
-            if key == "stats":
-                if val not in dataframes:
-                    dataframes[val] = list(store.values())[-1]
-                    args[key] = dataframes[val]
-
-                else:
-                    args[key] = dataframes[val]
-    
-
-
-        # Call the function directly
-        try:
-            result = globals()[func_name](**args)
-        except Exception as e:
-            raise RuntimeError(f"Error executing {func_name} with args {args}: {e}")
-
-        store[func_name] = result
-        
-
-    if len(vars) != 0:
-        return {it: store[it] for it in vars}  # dict of requested outputs
-    else:
-        return list(store.values())[-1]      
-    
-    # # 1. Display the head of the DataFrame to inspect it
-    # display_head(df, n=3)
-    
-    # # 2. Plot a line chart of daily sales over time
-    # plot_line_chart(df, x_col='date', y_col='daily_sales', title='Daily Sales Trend')
-
-    # # 3. For a bar chart, let's first aggregate the data
-    # category_sales = df.groupby('category')['daily_sales'].sum().reset_index()
-    # print("\n--- Aggregated Sales by Category ---")
-    # print(category_sales)
-    
-    # # Plot a bar chart of the aggregated sales
-    # plot_bar_chart(category_sales, x_col='category', y_col='daily_sales', title='Total Sales by Category')
-
-    # # 4. Save the aggregated data to a CSV file
-    # save_dataframe_to_csv(category_sales, 'category_sales_report.csv')        

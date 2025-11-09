@@ -155,15 +155,18 @@
         <!-- Step 1: Define Roles -->
         {% if roles_msg %}
         <div id="step-1" class="step-section">
-            <h2 class="step-header">Step 1: Define Roles of Each Function</h2>
+            <h2 class="step-header">Step 1:Functions</h2>
             <form action="/roles" method="post">
                 <div>
-                    <label for="functions">Function Names (comma-separated):</label>
-                    <input type="text" id="functions" name="functions" required>
+                    <label for="function">Function Name :</label>
+                    <input type="text" id="function" name="function" required>
                 </div>
+                </div>
+                    <label for="return_type">return type:</label>
+                    <input type="text" id="return_type" name="return_type" required>
                 <div>
-                    <label for="roles">Roles (comma-separated, match order):</label>
-                    <input type="text" id="roles" name="roles" required>
+                    <label for="role">Role:</label>
+                    <input type="text" id="role" name="role" required>
                 </div>
                 
                 <button type="submit" class="btn-primary">
@@ -176,14 +179,13 @@
         <!-- Step 2: Enter Number of Arguments -->
         {% if arg_counts_msg %}
         <div id="step-2" class="step-section">
-            <h2 class="step-header">Step 2: Enter Number of Arguments for Each Function</h2>
+            <h2 class="step-header">Step 2: Enter Number of Arguments</h2>
             <form action="/arg_counts" method="application/x-www-form-urlencoded">
-                {% for func in functions %}
-                    <div class="arg-input-row">
-                        <label>{{ func }}:</label>
-                        <input type="number" name="{{ func }}" min="0" required>
-                    </div>
-                {% endfor %}
+                <div class="arg-input-row">
+                        <label>{{ functions[0] }}:</label>
+                        <input type="number" name="{{ functions[0] }}" required>
+                </div>
+                
                 <button type="submit" class="btn-primary">
                     Next
                 </button>

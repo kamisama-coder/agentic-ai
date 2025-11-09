@@ -1,9 +1,9 @@
-from unit_saas import loader
+from unit_saas.loader import loader,load_user_functions
 import pandas as pd
 
 if __name__ == "__main__":
 
-    rules =  "Show me total revenue per product and save it in ass and sort ass in descending and save it in meow and then print meow.note:choose the value of dataframe according to you as necessary"
+    rules =  "Show me total revenue per product and save it in data1 and sort data1 in descending and save it in data2 and then print data2.note:choose the value of dataframe according to you as necessary"
 
     data = {
     "orderID": [1001, 1002, 1003, 1004, 1005, 1006, 1007],
@@ -21,8 +21,8 @@ if __name__ == "__main__":
     "region": ["North", "South", "East", "North", "West", "South", "South"]
 }
 
-    security_token = "7bd78b9f953a60ca249a5e2a1c03fb058195dcf353347ddef79c4ea9d485fffa"
+    security_token = "b595f4387c40aa904485dd06ad6de5fd56dc4d49a9bbaf3eede1b34400fb7779"
 
-    hello_world = loader(data=data,rules=rules,security_token=security_token,address="https://agentic-ai-nt21.onrender.com/call")
+    hello_world = loader(data=data,rules=rules,security_token=security_token,address="https://agentic-ai-nt21.onrender.com/call",vars=['data1'])
     print(hello_world)
 

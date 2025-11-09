@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from itsdangerous import URLSafeSerializer
 from pydantic import BaseModel
-from . import database
+import database
 import secrets
 from collections import defaultdict
 import sqlite3
@@ -21,7 +21,7 @@ import asyncio # Import asyncio for running subprocesses
 import aiofiles 
 from fastapi.concurrency import run_in_threadpool 
 import sys
-from . import llm 
+import llm 
 import tempfile
 from contextlib import redirect_stdout
 import time
@@ -75,11 +75,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def default_session():
-    return {
-        "roles": {},
-        "arg_counts": {},
-        "arg_names": defaultdict(dict)
-    }
+    return {}
 
 session_data = defaultdict(default_session)
 
@@ -137,16 +133,17 @@ def verify_password(plain_password, hashed_password):
 def read_users(user_id: int = Depends(get_current_user)):
     return {"current_user": user_id}
 
+@app.get("/add")
+def add_function(request: Request):
+    return templates.TemplateResponse("form.html", {"request": request, "roles_msg": True})
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
-
 @app.get("/register", response_class=HTMLResponse)
 def register_get(request: Request):
     return templates.TemplateResponse("register.html", {"request": request, "msg": None})
-
 
 @app.post("/register", response_class=HTMLResponse)
 def register_post(
@@ -168,7 +165,10 @@ def register_post(
 
     db.add(new_user)
     db.commit()
-    db.refresh(new_user)  # ✅ get new_user.id after commit
+    db.refresh(new_user) # ✅ get new_user.id after commit
+    set = database.UserData(user_id=new_user.id,json_data=llm.database()) 
+    db.add(set)
+    db.commit()
 
     # create response and set cookie
     resp = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
@@ -215,31 +215,41 @@ def login_post(
 
 
 @app.post("/roles", response_class=HTMLResponse,)
-def post_roles(request: Request, functions: str = Form(...), roles: str = Form(...),save_id: int = Depends(get_current_user)):
+def post_roles(request: Request, function: str = Form(...), role: str = Form(...),return_type: str = Form(...),save_id: int = Depends(get_current_user)):
     """
     functions: comma-separated function names
     roles: comma-separated descriptions
     """
-    func_list = [f.strip() for f in functions.split(",")]
-    role_list = [r.strip() for r in roles.split(",")]
-    session_data[save_id]["roles"] = dict(zip(func_list, role_list))
-    return templates.TemplateResponse("form.html", {"request": request, "functions": func_list, "arg_counts_msg": True})
+    func = function
+    return_type = return_type
+    role = role
+    if func not in session_data[save_id]:
+        session_data[save_id][func] = {}
+    session_data[save_id][func]["return_type"] = return_type
+    session_data[save_id][func]["role"] = role
+    print(session_data)
+    print(list(session_data[save_id].keys()))
+    return templates.TemplateResponse("form.html", {"request": request, "functions": list(session_data[save_id].keys()), "arg_counts_msg": True})
 
 @app.get("/arg_counts", response_class=HTMLResponse)
 def post_arg_counts(request: Request,save_id: int = Depends(get_current_user)):
     all_query_params = dict(request.query_params)
-    session_data[save_id]["arg_counts"] = {func: int(count) for func, count in all_query_params.items()}
+    for func, count in all_query_params.items():
+         session_data[save_id][func]["argument_count"] = count 
     print(session_data)
-    return templates.TemplateResponse("form.html", {"request": request, "functions": list(session_data[save_id]["roles"].keys()), "arg_names_msg": True})
+    print(list(session_data[save_id].keys()))
+    return templates.TemplateResponse("form.html", {"request": request, "functions": list(session_data[save_id].keys()), "arg_names_msg": True})
 
 @app.get("/arg_names", response_class=HTMLResponse)
 def post_arg_names(request: Request,save_id: int = Depends(get_current_user)):
     all_query_params = dict(request.query_params)
+    fink = list(session_data[save_id].keys())
+    session_data[save_id][fink[0]]["args"] = {}
     for func, names in all_query_params.items():
         for a in names.split(","):
-            session_data[save_id]["arg_names"][func][a.strip()] = {}
+            session_data[save_id][func]['args'][a.strip()] = {}
     print(session_data)
-    return templates.TemplateResponse("form.html", {"request": request, "functions": list(session_data[save_id]["roles"].keys()), "arg_meaning": True})
+    return templates.TemplateResponse("form.html", {"request": request, "functions": list(session_data[save_id].keys()), "arg_meaning": True})
 
 
 @app.get('/arg_roles', response_class=HTMLResponse)
@@ -252,18 +262,22 @@ def arg_functions(
 
     for func, role in all_query_params.items():
         # Split the roles by comma
-        role_list = [r.strip() for r in role.split(",")]
+        role_list = [r.strip() for r in role.split(";")]
 
         # Iterate arg_names and roles in parallel
-        for key, r in zip(session_data[save_id]['arg_names'][func].keys(), role_list):
-            session_data[save_id]['arg_names'][func][key]['role'] = r
+        for key, r in zip(session_data[save_id][func]['args'].keys(), role_list):
+            session_data[save_id][func]['args'][key] = r
 
-    # Store in DB
-    json_data = json.dumps(session_data[save_id])
-    stored_json = database.UserData(user_id=save_id, json_data=json_data)
-    db.add(stored_json)
+    user = db.query(database.UserData).filter(database.UserData.user_id == save_id).first()
+    for key, value in session_data[save_id].items():
+        save = user.json_data
+        save = save['functions']
+        save[key] = value
+        user.json_data = save
+
     db.commit()
 
+    del session_data[save_id]
     return templates.TemplateResponse("home.html", {"request": request, "api_key": True})    
     
 @app.post('/api_key',response_class=HTMLResponse)

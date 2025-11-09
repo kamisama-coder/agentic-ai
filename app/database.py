@@ -1,4 +1,5 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, JSON
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import sessionmaker, declarative_base,  relationship
 from datetime import datetime
 
@@ -31,7 +32,7 @@ class UserData(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    json_data = Column(Text)  
+    json_data = Column(MutableDict.as_mutable(JSON))  
 
     # Back reference to user
     user = relationship("User", back_populates="json_data_entries")
