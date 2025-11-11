@@ -290,7 +290,7 @@ class Controller:
 
         def connect_database(self): 
             headers = {"Authorization": f"token {self.api_key}"}
-            response = requests.get("http://localhost:8000/connect",headers=headers)
+            response = requests.get("https://agentic-ai-nt21.onrender.com/connect",headers=headers)
             response = response.json()  
             self.instruction = response
 
