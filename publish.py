@@ -21,8 +21,7 @@ if __name__ == "__main__":
     "region": ["North", "South", "East", "North", "West", "South", "South"]
 }
 
-    security_token = "5865d28fb81fcb1340e35486c8ad3e6a825a671f5ec5cd86e700d27a66945cbe"
-    load_user_functions(r"C:\Users\ASUS\Downloads\saas\made.py")
+    security_token = "15fcfbc51d8c412a94f7c05aea65721fb99df35962eba46f7725b9537ca87a32"
     hello_world = loader(data=data,rules=rules,security_token=security_token,address="https://agentic-ai-nt21.onrender.com/call",vars=['data1'])
     print(hello_world)
 

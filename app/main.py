@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from itsdangerous import URLSafeSerializer
 from pydantic import BaseModel
-import database
+from . import database
 import secrets
 from collections import defaultdict
 import sqlite3
@@ -21,7 +21,7 @@ import asyncio # Import asyncio for running subprocesses
 import aiofiles 
 from fastapi.concurrency import run_in_threadpool 
 import sys
-import llm 
+from . import llm 
 import tempfile
 from contextlib import redirect_stdout
 import time
