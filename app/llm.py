@@ -285,7 +285,7 @@ class Controller:
 
         def decrease_token(self):
             headers = {"Authorization": f"token {self.api_key}"}
-            requests.get("https://agentic-ai-nt21.onrender.com//decrease_token",headers=headers)
+            requests.get("https://agentic-ai-nt21.onrender.com/decrease_token",headers=headers)
 
 
         def connect_database(self): 
@@ -297,7 +297,7 @@ class Controller:
 
         def valid_apitoken(self,api_key):
             headers = {"Authorization": f"token {api_key}"}
-            response = requests.get("https://agentic-ai-nt21.onrender.com//valid",headers=headers)
+            response = requests.get("https://agentic-ai-nt21.onrender.com/valid",headers=headers)
             return response.json()['result']
         
 
@@ -319,14 +319,15 @@ class Controller:
             3. Determine the appropriate next function or AI agent to handle the processed data.
             4. Pass the processed input to that function or agent.
             5. Continue this process until the entire flow of instructions is completed.
-            6. Use the literal string 'df' for the dataframe argument, but change or create a new DataFrame only if the instruction explicitly requires it.
+            6. Use the literal string 'df' for the dataframe argument, but change or create a new DataFrame if required.
+            7. if argument requires the previous function output, just pass the name of the function as argument value.
             7. Return the result strictly as a valid Python dictionary — no additional text, explanations, or formatting other than the dictionary itself.
             8. If all instructions are processed, respond with the string: "finished".
 
 
             Always return your response in the following dictionary format:
             {{
-                "arguments": {{ "<arg_name>": <arg_value>, ... }},
+                "arguments": {{ "<arg_name>": <arg_value> or <previous_function>, ... }},
                 "function": "name of the function in which argument has to be passed"
             }}
 

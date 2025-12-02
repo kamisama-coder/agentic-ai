@@ -3,7 +3,7 @@ import pandas as pd
 
 if __name__ == "__main__":
 
-    rules =  "Show me total revenue per product and save it in data1 and sort data1 in descending and save it in data2 and then print data2.note:choose the value of dataframe according to you as necessary"
+    rules =  "Show me the total revenue for each product, sorted from highest to lowest"
 
     data = {
     "orderID": [1001, 1002, 1003, 1004, 1005, 1006, 1007],
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     "region": ["North", "South", "East", "North", "West", "South", "South"]
 }
 
-    security_token = "8339703acd33444f5b9ea06171519fa5141679d4f722773044b6865c46b3cce1"
-    hello_world = loader(data=data,rules=rules,security_token=security_token,address="https://agentic-ai-nt21.onrender.com/call",vars=['data1'])
+    security_token = "da087dffedb41c4071a836653c43bcd785948461a72b0c40d660310044d03014"
+    hello_world = loader(data=data,rules=rules,security_token=security_token)
     print(hello_world)
 

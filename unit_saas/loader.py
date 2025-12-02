@@ -42,7 +42,6 @@ def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: s
 }
 
 
-
     headers = {"Authorization": f"token {security_token}"}
 
     response = requests.post(url=address,json=params,headers=headers)
@@ -52,9 +51,6 @@ def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: s
     # Step 2: Execute functions directly
     # --------------------------
     store = {}
-    dataframes = {
-    'df': df 
-    }
 
     for it in response:
         func_name = it.get('function')
@@ -65,26 +61,15 @@ def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: s
         for key, val in args.items():
             if key == "dataframe":
                 if val != 'df':    
-                    if val not in dataframes:
-                        dataframes[val] = list(store.values())[-1]
-                        args[key] = dataframes[val]
-
-                    else:    
-                        args[key] = dataframes[val]     
+                    args[key] = store[val]    
 
                 else:
-                    args[key] = dataframes[val] 
+                    args[key] = df
 
             if key == "stats":
-                if val not in dataframes:
-                    dataframes[val] = list(store.values())[-1]
-                    args[key] = dataframes[val]
+                    args[key] = store[val] 
 
-                else:
-                    args[key] = dataframes[val]
     
-
-
         # Call the function directly
         try:
             result = func_registry[func_name](**args)
@@ -94,10 +79,7 @@ def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: s
         store[func_name] = result
         
 
-    if len(vars) != 0:
-        return {it: dataframes[it] for it in vars}  # dict of requested outputs
-    else:
-        return list(store.values())[-1]      
+    return list(store.values())[-1]      
     
     # # 1. Display the head of the DataFrame to inspect it
     # display_head(df, n=3)
