@@ -46,6 +46,7 @@ def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: s
 
     response = requests.post(url=address,json=params,headers=headers)
     response = response.json()
+    print(response)
 
     # --------------------------
     # Step 2: Execute functions directly
@@ -81,19 +82,4 @@ def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: s
 
     return list(store.values())[-1]      
     
-    # # 1. Display the head of the DataFrame to inspect it
-    # display_head(df, n=3)
-    
-    # # 2. Plot a line chart of daily sales over time
-    # plot_line_chart(df, x_col='date', y_col='daily_sales', title='Daily Sales Trend')
-
-    # # 3. For a bar chart, let's first aggregate the data
-    # category_sales = df.groupby('category')['daily_sales'].sum().reset_index()
-    # print("\n--- Aggregated Sales by Category ---")
-    # print(category_sales)
-    
-    # # Plot a bar chart of the aggregated sales
-    # plot_bar_chart(category_sales, x_col='category', y_col='daily_sales', title='Total Sales by Category')
-
-    # # 4. Save the aggregated data to a CSV file
-    # save_dataframe_to_csv(category_sales, 'category_sales_report.csv')        
+         

@@ -268,14 +268,12 @@ class Controller:
                 self.api_key = api_key
                 self.start = start
                 generativeai.configure(api_key=os.environ.get('API_KEY'))
-                self.model = generativeai.GenerativeModel('gemini-2.5-flash')
+                self.model = generativeai.GenerativeModel('gemini-3-flash-preview')
                 self.function_response = start
                 self.instruction = None
                 self.decrease_token()
                 self.connect_database()
-                self.chat = self.model.start_chat()
-                # self.thread = threading.Thread(target=self._instruction_watcher, daemon=True)
-                # self.thread.start()      
+                self.chat = self.model.start_chat()  
                 if self.instruction:
                     self.trigger(self.instruction)  
                     self.run()   
@@ -308,28 +306,32 @@ class Controller:
                 
 
         def trigger(self,instruction):
+
             prompt = f"""
             You are Gemini, the brain controlling multiple AI agents.
-            The user will provide the following instruction to be processed: "{instruction}".
-            The query to process is "{self.start}".
+            The prebuilt functions are: "{instruction}".
+            The query to process is: "{self.start}".
 
-            For each cycle:
-            1. Process the provided input according to the instruction.
-            2. If applicable, extract arguments or additional parameters from the input.
-            3. Determine the appropriate next function or AI agent to handle the processed data.
-            4. Pass the processed input to that function or agent.
-            5. Continue this process until the entire flow of instructions is completed.
-            6. Use the literal string 'df' for the dataframe argument, but change or create a new DataFrame if required.
-            7. if argument requires the previous function output, just pass the name of the function as argument value.
-            7. Return the result strictly as a valid Python dictionary — no additional text, explanations, or formatting other than the dictionary itself.
-            8. If all instructions are processed, respond with the string: "finished".
+            Instructions:
+            1. Analyze the instruction and query.
+            2. Determine the functions to executed.
+            3. Extract necessary arguments.
+            4. Return the result strictly as a valid Python dictionary — no additional text, explanations, or formatting other than the dictionary itself.
+            5. Use the literal string 'df' for the dataframe argument, but change or create a new DataFrame if required..
+            6. If argument requires the previous function output, just pass the name of the function as argument value.
+            7. If all instructions are completely processed, respond with the string: "finished".
 
+            Constraint:
+            - Output MUST be valid JSON.
+            - Do NOT wrap in markdown code blocks like ```json.
 
-            Always return your response in the following dictionary format:
+            Always return your response in the following valid JSON format:
+            [
             {{
                 "arguments": {{ "<arg_name>": <arg_value> or <previous_function>, ... }},
                 "function": "name of the function in which argument has to be passed"
-            }}
+            }},
+            ]
 
             """
             self.slow_save.append(prompt)
@@ -338,10 +340,8 @@ class Controller:
             
         def run(self):
         
-         while True:
-
             prompt = f"""
-           You are continuing from a previous interaction.  
+            You are continuing from a previous interaction.  
             The previous interactions are recorded in the list: {str(self.slow_save)}
             (Note: The index of the list represents the timeline/order of each event.)  
 
@@ -353,26 +353,29 @@ class Controller:
             """
 
             response = self.chat.send_message(prompt)
+            cleaned_response = clean_ai_output(response.text)
+            
+            
+            if isinstance(cleaned_response, list):
+                self.response = cleaned_response
+            elif isinstance(cleaned_response, dict):
+                 
+                 self.response = [cleaned_response]
+            else:
+                 
+                 print("Error: LLM did not return a list or dict.", cleaned_response)
+                 self.response = []
 
-            self.response = clean_ai_output(response.text)
-            if response.text == 'finished':
-                    break
-
-            for key, value in self.response.get('arguments', {}).items():  
-                    self.response['arguments'][key] = safe_convert(value)
-
+            for step in self.response:
+                if isinstance(step, dict):
+                    
+                    for key, value in step.get('arguments', {}).items():  
+                        step['arguments'][key] = safe_convert(value)
+            
             print("Convertor Response:", self.response) 
 
-            try:
-
-                if not self.response['arguments']:
-                    raise TypeError("No arguments provided")      
-
-                self.slow_save.append(self.response)
-
-            except (KeyError,TypeError,AttributeError):
-
-                break
+            if self.response:
+                self.slow_save.extend(self.response)
 
         def get_output(self):
             self.slow_save.pop(0)
