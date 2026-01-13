@@ -23,19 +23,20 @@ def clean_ai_output(response_text):
     
 
 def safe_convert(value):
+
     if isinstance(value, str):
         try:
-            # First try normal literal evaluation
+            
             return ast.literal_eval(value)
         except (ValueError, SyntaxError, TypeError):
-            # Handle torch tensor strings like "tensor([1.0, 2.0, 3.0])"
+            
             if value.startswith("tensor(") and value.endswith(")"):
-                inner = value[len("tensor("):-1].strip()  # extract inside part
+                inner = value[len("tensor("):-1].strip()  
                 try:
-                    data = ast.literal_eval(inner)  # parse safely into list/tuple
+                    data = ast.literal_eval(inner)  
                     return torch.tensor(data)
                 except Exception:
-                    return value  # fallback to original string
+                    return value  
             return value
     else:
         return value   
@@ -259,7 +260,7 @@ def database():
 
 
 class Controller:
-        def __init__(self,start,api_key):
+        def __init__(self,start,api_key, gemini_key):
             self.check = self.valid_apitoken(api_key)
             if self.check:   
                 self.store = {}
@@ -267,11 +268,10 @@ class Controller:
                 self.slow_save = []
                 self.api_key = api_key
                 self.start = start
-                generativeai.configure(api_key=os.environ.get('API_KEY'))
+                generativeai.configure(api_key=gemini_key)
                 self.model = generativeai.GenerativeModel('gemini-3-flash-preview')
                 self.function_response = start
                 self.instruction = None
-                self.decrease_token()
                 self.connect_database()
                 self.chat = self.model.start_chat()  
                 if self.instruction:
@@ -280,12 +280,7 @@ class Controller:
             else:
                 raise PermissionError("Invalid API token")
             
-
-        def decrease_token(self):
-            headers = {"Authorization": f"token {self.api_key}"}
-            requests.get("https://agentic-ai-nt21.onrender.com/decrease_token",headers=headers)
-
-
+            
         def connect_database(self): 
             headers = {"Authorization": f"token {self.api_key}"}
             response = requests.get("https://agentic-ai-nt21.onrender.com/connect",headers=headers)
@@ -383,22 +378,12 @@ class Controller:
 
 
 
-def creator(start,save_id,):    
-    return Controller(start,save_id)    
+def creator(start,save_id, gemini_key):    
+    return Controller(start,save_id, gemini_key)    
 
 
           
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# filename = os.path.join(current_dir, "test.py")
-
-
-# creation_obj = creator(
-#     "generate a sentence about a 'vase' and generate the embeddings of the text and generate the embeddings of the image 'chinese vase.jpg' and compare them",
-#     'aa47fcb7de42ea818c32fb81f8087089faad90d13de7b5fe4cce2be0ae820ae7',
-#     filename,
-#     float
-# )            
+           
          
             
             

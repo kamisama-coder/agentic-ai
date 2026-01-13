@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Razorpay Payment Demo</title>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
@@ -14,6 +15,7 @@
       align-items: center;
       background: #f7f7f7;
     }
+
     #pay-btn {
       padding: 12px 24px;
       font-size: 18px;
@@ -24,47 +26,46 @@
       cursor: pointer;
       transition: 0.3s;
     }
+
     #pay-btn:hover {
       background-color: #287aa6;
     }
   </style>
 </head>
+
 <body>
   <button id="pay-btn">Pay ₹1000</button>
 
   <script>
-    // Function to create order by calling FastAPI backend
     async function createOrder() {
-      let response = await fetch("http://localhost:8000/create-order?amount=1000", {
+      let response = await fetch("/create-order?amount=1000", {
         method: "POST"
       });
       let order = await response.json();
       return order;
     }
 
-    // Handle button click
-    document.getElementById('pay-btn').onclick = async function(e) {
+    document.getElementById('pay-btn').onclick = async function (e) {
       const order = await createOrder();
 
       var options = {
-        "key": "rzp_test_R9HkZqqt7zcFbc", // Replace with your Razorpay Key ID
+        "key": "{{ key_id }}",
         "amount": order.amount,
         "currency": order.currency,
         "name": "My Shop",
         "description": "Test Transaction",
-        "order_id": order.id, // order_id from backend
+        "order_id": order.id,
         "handler": async function (response) {
-          // Send details back to FastAPI for verification
-          let verifyRes = await fetch("http://localhost:8000/verify-payment/", {
+          let verifyRes = await fetch("/verify-payment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(response)
           });
           let verifyData = await verifyRes.json();
           if (verifyData.status === "success") {
-            alert("✅ Payment Successful!");
+            window.location.href = "/?msg=Payment Successful";
           } else {
-            alert("❌ Payment Verification Failed!");
+            window.location.href = "/?msg=Payment Failed";
           }
         },
         "prefill": {
@@ -83,6 +84,5 @@
     };
   </script>
 </body>
+
 </html>
-
-

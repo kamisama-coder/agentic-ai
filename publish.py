@@ -21,7 +21,7 @@ if __name__ == "__main__":
     "region": ["North", "South", "East", "North", "West", "South", "South"]
 }
 
-    security_token = "b034960ecdc4786b07fdef495eb6346379b5a111130be8e8a4cef7fac250fd62"
-    hello_world = loader(data=data,rules=rules,security_token=security_token)
+    security_token = "1ed338390119fa9eb9c24c602fa883c2ef435e14e409fbb2dd4865a73ad6d0e5"
+    hello_world = loader(data=data,rules=rules,security_token=security_token,gemini_key="AIzaSyBtXExmhI5vjn1ZxvfN-2fTDdO4IzkWRPE")
     print(hello_world)
 

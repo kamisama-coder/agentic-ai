@@ -26,7 +26,7 @@ def load_user_functions(path: str = "user_functions.py"):
     load_functions(user_module, func_registry)
 
 
-def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: str=None,address: str="http://localhost:8000/call",vars: list=[]):
+def loader(security_token: str, gemini_key: str, frame: pd.DataFrame=None,data: dict=None,rules: str=None,address: str="http://localhost:8000/call",vars: list=[]):
     # Create a sample DataFrame
 
     df = None
@@ -42,7 +42,10 @@ def loader(security_token: str,frame: pd.DataFrame=None,data: dict=None,rules: s
 }
 
 
-    headers = {"Authorization": f"token {security_token}"}
+    headers = {
+        "Authorization": f"token {security_token}",
+        "x-gemini-api-key": gemini_key
+    }
 
     response = requests.post(url=address,json=params,headers=headers)
     response = response.json()

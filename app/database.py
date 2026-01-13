@@ -22,8 +22,6 @@ class User(Base):
     hashed_password = Column(String)
     created_at = Column(DateTime)
     api_key = Column(String)
-    remaining_token = Column(Integer)
-    paid = Column(String, default='no')
 
     json_data_entries = relationship("UserData", back_populates="user")
 
@@ -34,7 +32,6 @@ class UserData(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     json_data = Column(MutableDict.as_mutable(JSON))  
 
-    # Back reference to user
     user = relationship("User", back_populates="json_data_entries")
 
 Base.metadata.create_all(bind=engine)
