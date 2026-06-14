@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unit_saas"
-version = "0.7.0"
+version = "0.8.5"
 description = "My SAAS internal package"
 authors = [
   { name = "Sanidhya", email = "sanidhyaagrawal2002@gmail.com" }

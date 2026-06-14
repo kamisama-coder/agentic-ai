@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import requests
 import importlib.util
@@ -25,7 +26,11 @@ def load_user_functions(path: str = "user_functions.py"):
     spec.loader.exec_module(user_module)
     load_functions(user_module, func_registry)
 
-
+def load_user_functions_from_folder(path: str):
+    for filename in os.listdir(path):
+        if filename.endswith(".py") and not filename.startswith("__"):
+            load_user_functions(os.path.join(path, filename))
+       
 def loader(security_token: str, gemini_key: str, frame: pd.DataFrame=None,data: dict=None,rules: str=None,address: str="http://localhost:8000/call",vars: list=[]):
     # Create a sample DataFrame
 
@@ -38,8 +43,9 @@ def loader(security_token: str, gemini_key: str, frame: pd.DataFrame=None,data: 
 
 
     params = {
-    "prompt": rules
-}
+        "prompt": rules,
+        "function_registry": str(func_registry)
+    }
 
 
     headers = {
@@ -49,7 +55,6 @@ def loader(security_token: str, gemini_key: str, frame: pd.DataFrame=None,data: 
 
     response = requests.post(url=address,json=params,headers=headers)
     response = response.json()
-    print(response)
 
     # --------------------------
     # Step 2: Execute functions directly
@@ -83,6 +88,6 @@ def loader(security_token: str, gemini_key: str, frame: pd.DataFrame=None,data: 
         store[func_name] = result
         
 
-    return list(store.values())[-1]      
+    return (list(store.values())[-1],df)      
     
          

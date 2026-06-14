@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from itsdangerous import URLSafeSerializer
 from pydantic import BaseModel
-from .import database
+from . import database
 import secrets
 from collections import defaultdict
 import sqlite3
@@ -283,6 +283,7 @@ async def call_api(request: Request, authorization: str = Header(None), x_gemini
     try:
         params = await request.json()
         prompt = params['prompt']
+        function_registry = params.get('function_registry', '')
     except (json.JSONDecodeError, KeyError) as e:
         raise HTTPException(status_code=400, detail=f"Invalid or missing parameters in request body: {e}")
 
@@ -292,7 +293,7 @@ async def call_api(request: Request, authorization: str = Header(None), x_gemini
     def run_llm_logic():
             """Wrapper function for the synchronous LLM code."""
             with redirect_stdout(log_stream):
-                controller = llm.creator(prompt, token, x_gemini_api_key)
+                controller = llm.creator(prompt, token, x_gemini_api_key, function_registry)
                 return controller.get_output()
 
     result = await run_in_threadpool(run_llm_logic)
