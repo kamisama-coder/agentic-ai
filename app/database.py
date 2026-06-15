@@ -2,13 +2,11 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateT
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import sessionmaker, declarative_base,  relationship
 from datetime import datetime
+import os
 
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost/dbname")
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./users.db"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

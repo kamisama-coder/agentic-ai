@@ -62,7 +62,7 @@ def get_db():
     finally:
         db.close()
 
-SECRET_KEY = "hts5eh45w54hh46h46h66srd" 
+SECRET_KEY = os.getenv("SECRET_KEY")
 COOKIE_NAME = "session"
 
 serializer = URLSafeSerializer(SECRET_KEY)
