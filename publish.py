@@ -22,7 +22,7 @@ if __name__ == "__main__":
 }
 
     security_token = "9b233321eb50c643d31d9643e2099bba823f3b2ddfb88219a604148f9c74b318"
-    hello,world = loader(data=data,rules=rules,security_token=security_token,gemini_key="AQ.Ab8RN6I8oG9SxnwedHHhKtfAHJSwq_DXtPPB9Jggu_wHKTAm5g",address="https://agentic-ai-nt21.onrender.com/call")
+    hello,world = loader(data=data,rules=rules,security_token=security_token,gemini_key="fffffffffffffffff",address="https://agentic-ai-nt21.onrender.com/call")
     print(hello)
     print(world)
 
