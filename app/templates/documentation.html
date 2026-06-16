@@ -4,107 +4,329 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>unit_saas Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f9f9fb;
+        :root {
+            --bg-main: #0b0f19;
+            --bg-sidebar: #111827;
+            --bg-card: #1f2937;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #38bdf8;
+            --accent-hover: #7dd3fc;
+            --border: #374151;
+            --code-bg: #1e1e2e;
+            --highlight-bg: rgba(56, 189, 248, 0.1);
+            --highlight-border: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 40px;
-            color: #333;
+            padding: 0;
         }
-        h1, h2, h3 {
-            color: #2c3e50;
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.6;
         }
+
+        /* Sidebar Styling */
+        aside {
+            width: 280px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            padding: 2rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Main Content Styling */
+        main {
+            margin-left: 280px;
+            max-width: 900px;
+            padding: 3rem 4rem;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+        }
+
+        /* Parameter Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.02);
+            font-weight: 600;
+            color: #fff;
+        }
+
+        td strong {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Code Block Styling */
         pre {
-            background-color: #f4f4f4;
-            padding: 15px;
+            background-color: var(--code-bg);
+            padding: 1.5rem;
             border-radius: 8px;
             overflow-x: auto;
             position: relative;
+            border: 1px solid var(--border);
+            margin: 1rem 0 1.5rem 0;
         }
+
         code {
-            color: #c7254e;
-            background-color: #f9f2f4;
-            padding: 2px 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        p code, li code, td code {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #f472b6;
+            padding: 0.2rem 0.4rem;
             border-radius: 4px;
+            font-size: 0.85rem;
         }
-        .section {
-            margin-bottom: 40px;
-        }
-        .highlight {
-            background-color: #eef9f3;
-            border-left: 5px solid #2ecc71;
-            padding: 10px 15px;
-            border-radius: 6px;
-        }
+
         .copy-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            background-color: #2c3e50;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
+            top: 0.75rem;
+            right: 0.75rem;
+            padding: 0.35rem 0.75rem;
+            background-color: var(--bg-card);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: #fff;
+            background-color: var(--border);
+        }
+
+        /* Callout Highlight boxes */
+        .callout {
+            background-color: var(--highlight-bg);
+            border-left: 4px solid var(--highlight-border);
+            padding: 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .callout strong {
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            aside {
+                display: none;
+            }
+            main {
+                margin-left: 0;
+                padding: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>unit_saas Documentation</h1>
-    <p><strong>unit_saas</strong> is a Python library that provides an easy way to process data frames and structured content using dynamic rule-based prompts.</p>
 
-    <div class="section">
-        <h2>Installation</h2>
-        <pre><button class="copy-btn" data-target="install-code">Copy</button><code id="install-code">pip install unit_saas</code></pre>
-    </div>
-
-    <div class="section">
-        <h2>Import</h2>
-        <pre><button class="copy-btn" data-target="import-code">Copy</button><code id="import-code">from unit_saas import loader</code></pre>
-    </div>
-
-    <div class="section">
-        <h2>Function: <code>loader</code></h2>
-        <p>The <code>loader</code> function is the core of <strong>unit_saas</strong>. It processes data frames and dictionaries according to a set of rules and sends the processed result to a specified endpoint.</p>
-
-        <h3>Arguments</h3>
-        <ul>
-            <li><strong>security_token</strong>: Token generated using the API key for authentication.</li>
-            <li><strong>frame</strong>: Pandas DataFrame to process.</li>
-            <li><strong>data</strong>: Dictionary containing the content (either <code>frame</code> or <code>data</code> can be <code>None</code>).</li>
-            <li><strong>rules</strong>: Prompt containing the steps or logic to apply to the data.</li>
-            <li><strong>address</strong>: URL endpoint to which the POST request should be sent.</li>
-            <li><strong>vars</strong>: Variables that should be returned(should be a pythonic list)</li>
+    <aside>
+        <div class="logo"></div>
+        <ul class="nav-links">
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#quickstart">Quickstart</a></li>
+            <li><a href="#core-loader">Function: loader</a></li>
+            <li><a href="#custom-functions">Custom Functions</a></li>
+            <li><a href="#example">Complete Example</a></li>
         </ul>
-        
-        <div class="highlight">
-        <strong>Note:</strong> Variables listed in <code>vars</code> will only be returned if they are <em>used</em> or <em>defined</em> within the <code>rules</code> prompt. 
-        Make sure to reference each variable in your rules logic to ensure their values are properly stored and accessible.
-        </div>
-    </div>
+    </aside>
 
-    <div class="section">
-        <h2>Example Usage</h2>
-        <pre><button class="copy-btn" data-target="example-code">Copy</button><code id="example-code">from unit_saas import loader
+    <main>
+        <h1>unit_saas Documentation</h1>
+        <p>A lightweight, dynamic Python library built to effortlessly process complex pandas dataframes and structured data structures using customized rule-based prompts.</p>
+
+        <section id="installation">
+            <h2>Installation</h2>
+            <p>Install the official package from PyPI using your favorite package manager:</p>
+            <pre><button class="copy-btn" data-target="install-code">Copy</button><code id="install-code">pip install unit_saas</code></pre>
+        </section>
+
+        <section id="quickstart">
+            <h2>Quickstart</h2>
+            <p>Import the core loader asset into your script implementation:</p>
+            <pre><button class="copy-btn" data-target="import-code">Copy</button><code id="import-code">from unit_saas import loader</code></pre>
+        </section>
+
+        <section id="core-loader">
+            <h2>Function: <code>loader()</code></h2>
+            <p>The core execution method responsible for parsing operational data frames and runtime structures against specific prompt conditions before pushing payloads onwards to a chosen listener endpoint.</p>
+
+            <h3>Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Argument</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>security_token</strong></td>
+                        <td>String</td>
+                        <td>Secure hash generation used to complete server-side API handshakes.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>data</strong></td>
+                        <td>dict</td>
+                        <td>data structured as a dictionary</td>
+                    </tr>
+                    <tr>
+                        <td><strong>rules</strong></td>
+                        <td>String</td>
+                        <td>Natural language instruction sequence detailing transformations to execute.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>address</strong></td>
+                        <td>String (URL)</td>
+                        <td>Target POST address endpoint. Defaults directly to: <code>https://agentic-ai-nt21.onrender.com/call</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>frame</strong></td>
+                        <td>pd.DataFrame</td>
+                        <td>Data structured as a DataFrame.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout">
+                <strong>Important Note:</strong> Parameters defined dynamically in runtime tracking steps will only render correctly back to systemic outputs if explicitly references/utilized within your logical <code>rules</code> sequence text.
+            </div>
+        </section>
+
+        <section id="custom-functions">
+            <h2>Extending with User Functions</h2>
+            <p>Dynamically load individual python custom extensions or complete modular script directories straight into the pipeline engine using the context rules below.</p>
+            
+            <h3>Load a Specific File</h3>
+            <pre><button class="copy-btn" data-target="func-code">Copy</button><code id="func-code">from unit_saas import load_user_functions
+
+# Point to the explicit file system location containing your custom definitions
+load_user_functions("/path/to/your/custom_functions.py")</code></pre>
+
+            <h3>Load an Entire Folder Directory</h3>
+            <pre><button class="copy-btn" data-target="folder-code">Copy</button><code id="folder-code">from unit_saas import load_user_functions_from_folder
+
+# Iteratively pull all processing functions located across a targeted local directory
+load_user_functions_from_folder("/path/to/functions/directory")</code></pre>
+        </section>
+
+        <section id="example">
+            <h2>Complete Example Usage</h2>
+            <p>The template workflow scenario displays loading an initial student dictionary object, transforming it via execution prompts, and submitting safely using runtime access configurations:</p>
+            
+            <pre><button class="copy-btn" data-target="example-code">Copy</button><code id="example-code">from unit_saas import loader
 
 if __name__ == "__main__":
 
-    rules =  """Take the DataFrame df and perform the following steps:
-
+    prompt = """Take the DataFrame df and perform the following steps:
 1. Display the first 5 rows of df.
-
 2. Handle any missing values in the column 'Age' by filling them with the mean of the column, storing the updated DataFrame in a variable called 'df_filled'.
-
 3. Remove any duplicate rows from 'df_filled', storing the result in 'df_no_duplicates'.
-
 4. Change the data type of the column 'Age' in 'df_no_duplicates' to integer, storing the result in 'df_typed'.
-
 5. Filter 'df_typed' to include only rows where 'Is_Student' is True, storing the result in 'df_students'.
-
 6. Calculate descriptive statistics (mean, median, std, min, max, count) for the 'Age' column in 'df_students' and store the result in a variable called 'student_age_stats'.
-
 7. Display the contents of 'student_age_stats' with the title "Student Age Statistics".
 """
 
@@ -117,11 +339,11 @@ if __name__ == "__main__":
 
     security_token = "089f9d1475e3db7fd6ecc8a218ebd974b40f0b3fcf3d88bc6b6c9b8b6d55444c"
 
-    some_variable = loader(data=data, rules=rules, security_token=security_token)
-    for it in some_variable:
-        print(it)
-    </code></pre>
-    </div>
+    # Process execution block 
+    some_variable = loader(data=data, rules=prompt, security_token=security_token)
+    print(some_variable)</code></pre>
+        </section>
+    </main>
 
     <script>
         const copyButtons = document.querySelectorAll('.copy-btn');
@@ -129,11 +351,15 @@ if __name__ == "__main__":
             btn.addEventListener('click', () => {
                 const targetId = btn.getAttribute('data-target');
                 const code = document.getElementById(targetId);
-                navigator.clipboard.writeText(code.innerText).then(() => {
+                navigator.clipboard.writeText(code.innerText.trim()).then(() => {
                     btn.innerText = 'Copied!';
-                    setTimeout(() => btn.innerText = 'Copy', 1500);
+                    btn.style.borderColor = 'var(--highlight-border)';
+                    setTimeout(() => {
+                        btn.innerText = 'Copy';
+                        btn.style.borderColor = 'var(--border)';
+                    }, 1500);
                 }).catch(() => {
-                    btn.innerText = 'Copy';
+                    btn.innerText = 'Error';
                 });
             });
         });
