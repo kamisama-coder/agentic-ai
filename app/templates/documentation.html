@@ -287,6 +287,11 @@
                         <td>pd.DataFrame</td>
                         <td>Data structured as a DataFrame.</td>
                     </tr>
+                    <tr>
+                        <td><strong>gemini_key</strong></td>
+                        <td>String</td>
+                        <td>API key for Gemini integration.</td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -340,7 +345,7 @@ if __name__ == "__main__":
     security_token = "089f9d1475e3db7fd6ecc8a218ebd974b40f0b3fcf3d88bc6b6c9b8b6d55444c"
 
     # Process execution block 
-    some_variable = loader(data=data, rules=prompt, security_token=security_token)
+    some_variable = loader(data=data, rules=prompt, security_token=security_token, gemini_key="your_gemini_key", address="https://agentic-ai-nt21.onrender.com/call")
     print(some_variable)</code></pre>
         </section>
     </main>
