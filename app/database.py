@@ -35,4 +35,4 @@ class UserData(Base):
 
     user = relationship("User", back_populates="json_data_entries")
 
-Base.metadata.create_all(bind=engine)
+

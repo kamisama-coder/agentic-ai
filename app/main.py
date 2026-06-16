@@ -19,12 +19,16 @@ import io
 from fastapi.concurrency import run_in_threadpool 
 import sys
 from . import llm 
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, asynccontextmanager
 import time
 import razorpay
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    database.Base.metadata.create_all(bind=database.engine)
+    yield
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="app/templates")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
