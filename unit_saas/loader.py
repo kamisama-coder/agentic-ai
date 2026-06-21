@@ -42,9 +42,12 @@ def loader(security_token: str, gemini_key: str, frame: pd.DataFrame=None,data: 
         df = pd.DataFrame(data)
 
 
+    header_row = df.columns.tolist() if df is not None else []
+
     params = {
         "prompt": rules,
-        "function_registry": str(func_registry)
+        "function_registry": str(func_registry),
+        "header_row": header_row
     }
 
 

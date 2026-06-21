@@ -260,7 +260,7 @@ def database():
 
 
 class Controller:
-        def __init__(self,start,api_key, gemini_key, function_registry=None):
+        def __init__(self,start,api_key, gemini_key, function_registry=None, header_row=None):
             self.check = self.valid_apitoken(api_key)
             if self.check:   
                 self.store = {}
@@ -269,6 +269,7 @@ class Controller:
                 self.api_key = api_key
                 self.start = start
                 self.function_registry = function_registry
+                self.header_row = header_row
                 generativeai.configure(api_key=gemini_key)
                 self.model = generativeai.GenerativeModel('gemini-3.5-flash')
                 self.function_response = start
@@ -308,6 +309,7 @@ class Controller:
             The prebuilt functions are: "{instruction}".
             The available user functions are: "{self.function_registry}".
             The query to process is: "{self.start}".
+            The dataframe headers are: "{self.header_row}".
 
             Instructions:
             1. Analyze the instruction and query.
@@ -380,8 +382,8 @@ class Controller:
 
 
 
-def creator(start,save_id, gemini_key, function_registry=None):    
-    return Controller(start,save_id, gemini_key, function_registry)    
+def creator(start,save_id, gemini_key, function_registry=None, header_row=None):    
+    return Controller(start,save_id, gemini_key, function_registry, header_row)    
 
 
           
