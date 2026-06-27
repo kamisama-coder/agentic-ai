@@ -1,9 +1,9 @@
-from unit_saas.loader import loader,load_user_functions
+from unit_saas import loader,load_user_functions
 import pandas as pd
 
 if __name__ == "__main__":
 
-    rules =  "Show me the total revenue for each product, sorted from highest to lowest"
+    rules =  "Show me the total revenue for each product and tell average revenue"
 
     data = {
     "orderID": [1001, 1002, 1003, 1004, 1005, 1006, 1007],
@@ -21,8 +21,8 @@ if __name__ == "__main__":
     "region": ["North", "South", "East", "North", "West", "South", "South"]
 }
 
-    security_token = "9b233321eb50c643d31d9643e2099bba823f3b2ddfb88219a604148f9c74b318"
-    hello,world = loader(data=data,rules=rules,security_token=security_token,gemini_key="fffffffffffffffff",address="https://agentic-ai-nt21.onrender.com/call")
+    security_token = "ffffffffffffffffffff"
+    hello,world = loader(data=data,rules=rules,security_token=security_token,gemini_key="ffffffffffffffffff",address="https://agentic-ai-nt21.onrender.com/call")
     print(hello)
     print(world)
 
